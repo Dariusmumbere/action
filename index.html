@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Growth Tracker AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Palette: deep charcoal-navy ground, emerald = growth,
+   amber-gold = wealth/prosperity accent. Two-tone signature
+   reflects the app's purpose: turning daily hustle (emerald)
+   into stored wealth (gold).
+   ============================================================ */
+:root{
+  --bg-0:#0b1210;
+  --bg-1:#0f1b17;
+  --bg-2:#132420;
+  --panel:rgba(20,36,31,0.62);
+  --panel-solid:#132420;
+  --panel-border:rgba(126,211,171,0.14);
+  --panel-border-strong:rgba(126,211,171,0.28);
+  --emerald:#34d399;
+  --emerald-dim:#1f8f68;
+  --emerald-glow:rgba(52,211,153,0.35);
+  --gold:#e8b84b;
+  --gold-dim:#b8902f;
+  --red:#f0655f;
+  --blue:#5aa9e6;
+  --text-0:#eef7f2;
+  --text-1:#b7c9c1;
+  --text-2:#7c9089;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow-1:0 10px 30px -12px rgba(0,0,0,0.55);
+  --shadow-2:0 20px 60px -20px rgba(0,0,0,0.65);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(1100px 600px at 12% -10%, rgba(52,211,153,0.10), transparent 60%),
+    radial-gradient(900px 700px at 110% 10%, rgba(232,184,75,0.08), transparent 55%),
+    var(--bg-0);
+  color:var(--text-0);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::selection{background:var(--emerald-glow);}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(126,211,171,0.22);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(126,211,171,0.4);}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}}
+
+.hidden{display:none !important;}
+.glass{
+  background:var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:var(--shadow-1);
+}
+
+/* ============================================================
+   AUTH SCREEN
+   ============================================================ */
+#authScreen{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1.15fr 1fr;
+}
+@media (max-width:920px){ #authScreen{grid-template-columns:1fr;} #authHero{display:none;} }
+#authHero{
+  position:relative;
+  padding:64px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  border-right:1px solid var(--panel-border);
+}
+#authHero::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(600px 400px at 20% 20%, rgba(52,211,153,0.16), transparent 60%),
+    radial-gradient(500px 500px at 90% 80%, rgba(232,184,75,0.13), transparent 60%);
+  z-index:0;
+}
+.brandmark{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
+.brandmark .mark{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(145deg,var(--emerald),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;color:#08130f;font-size:19px;
+  box-shadow:0 8px 24px -8px var(--emerald-glow);
+}
+.brandmark span{font-family:var(--font-display);font-weight:600;font-size:19px;letter-spacing:-0.01em;}
+#authHero .pitch{position:relative;z-index:1;max-width:520px;}
+#authHero .pitch h1{
+  font-family:var(--font-display);
+  font-size:44px;line-height:1.08;font-weight:700;letter-spacing:-0.02em;
+  margin-bottom:18px;
+}
+#authHero .pitch h1 .accent{
+  background:linear-gradient(120deg,var(--emerald),var(--gold));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+#authHero .pitch p{color:var(--text-1);font-size:15.5px;line-height:1.7;}
+#authHero .growth-arc{position:relative;z-index:1;height:150px;}
+.statrow{display:flex;gap:36px;position:relative;z-index:1;flex-wrap:wrap;}
+.statrow .stat b{display:block;font-family:var(--font-display);font-size:24px;color:var(--emerald);}
+.statrow .stat span{font-size:12.5px;color:var(--text-2);}
+
+#authPane{display:flex;align-items:center;justify-content:center;padding:32px;}
+.authCard{width:100%;max-width:400px;padding:38px 34px;}
+.authCard h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;}
+.authCard .sub{color:var(--text-2);font-size:13.5px;margin-bottom:26px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;color:var(--text-1);margin-bottom:6px;font-weight:500;}
+.field input,.field select{
+  width:100%;padding:11px 13px;border-radius:var(--radius-sm);
+  border:1px solid var(--panel-border);background:rgba(8,16,13,0.55);
+  color:var(--text-0);font-size:14px;outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--emerald-dim);box-shadow:0 0 0 3px var(--emerald-glow);}
+.field input::placeholder{color:var(--text-2);}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 18px;border-radius:var(--radius-sm);border:none;
+  font-size:14px;font-weight:600;transition:transform .12s, box-shadow .12s, opacity .12s;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(120deg,var(--emerald),#22c398);color:#06140f;box-shadow:0 10px 24px -10px var(--emerald-glow);}
+.btn-primary:hover{box-shadow:0 14px 30px -10px var(--emerald-glow);}
+.btn-gold{background:linear-gradient(120deg,var(--gold),#f0c96a);color:#231a04;}
+.btn-ghost{background:rgba(126,211,171,0.08);color:var(--text-0);border:1px solid var(--panel-border);}
+.btn-ghost:hover{border-color:var(--panel-border-strong);}
+.btn-danger{background:rgba(240,101,95,0.14);color:#ffb3af;border:1px solid rgba(240,101,95,0.3);}
+.btn-block{width:100%;}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:8px;}
+.authCard .btn-block{margin-top:6px;}
+.authSwitch{margin-top:20px;text-align:center;font-size:13.5px;color:var(--text-2);}
+.authSwitch a{color:var(--emerald);font-weight:600;}
+.formErr{background:rgba(240,101,95,0.12);border:1px solid rgba(240,101,95,0.3);color:#ffb3af;
+  padding:9px 12px;border-radius:9px;font-size:13px;margin-bottom:14px;display:none;}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+#app{display:grid;grid-template-columns:248px 1fr;min-height:100vh;}
+@media (max-width:880px){ #app{grid-template-columns:1fr;} }
+
+#sidebar{
+  border-right:1px solid var(--panel-border);
+  background:rgba(10,18,15,0.55);
+  padding:22px 16px;
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  z-index:40;
+}
+@media (max-width:880px){
+  #sidebar{position:fixed;left:0;top:0;width:248px;transform:translateX(-105%);transition:transform .22s ease;box-shadow:var(--shadow-2);}
+  #sidebar.open{transform:translateX(0);}
+}
+#sidebar .brandmark{padding:6px 8px 22px;}
+#sidebar .brandmark span{font-size:16.5px;}
+#sidebar .brandmark .mark{width:34px;height:34px;font-size:15px;border-radius:10px;}
+.navgroup{margin-bottom:4px;}
+.navlabel{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);padding:14px 10px 6px;}
+.navlink{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;
+  color:var(--text-1);font-size:13.8px;font-weight:500;margin-bottom:2px;
+  transition:background .15s,color .15s;
+}
+.navlink i{width:17px;text-align:center;font-size:14px;color:var(--text-2);transition:color .15s;}
+.navlink:hover{background:rgba(126,211,171,0.07);color:var(--text-0);}
+.navlink.active{background:linear-gradient(90deg,rgba(52,211,153,0.16),rgba(52,211,153,0.02));color:var(--text-0);}
+.navlink.active i{color:var(--emerald);}
+#sidebarFooter{margin-top:auto;padding-top:14px;border-top:1px solid var(--panel-border);}
+.userchip{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;}
+.userchip .av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--emerald-dim),var(--gold-dim));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:14px;}
+.userchip .info b{display:block;font-size:13px;}
+.userchip .info span{font-size:11px;color:var(--text-2);}
+
+#mainWrap{min-width:0;}
+#topbar{
+  position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 26px;border-bottom:1px solid var(--panel-border);
+  background:rgba(11,18,16,0.72);backdrop-filter:blur(14px);
+}
+#menuToggle{display:none;background:transparent;border:1px solid var(--panel-border);color:var(--text-0);width:36px;height:36px;border-radius:9px;align-items:center;justify-content:center;}
+@media (max-width:880px){ #menuToggle{display:flex;} }
+#pageTitle{font-family:var(--font-display);font-size:19px;font-weight:600;flex:1;}
+#pageTitle span{color:var(--text-2);font-size:12.5px;font-weight:400;display:block;font-family:var(--font-body);margin-top:2px;}
+.iconbtn{
+  width:38px;height:38px;border-radius:10px;border:1px solid var(--panel-border);
+  background:rgba(126,211,171,0.05);color:var(--text-1);display:flex;align-items:center;justify-content:center;
+  position:relative;transition:all .15s;
+}
+.iconbtn:hover{border-color:var(--panel-border-strong);color:var(--text-0);}
+.badge-dot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--gold);border:2px solid var(--bg-0);}
+
+#content{padding:26px;max-width:1400px;}
+.section{display:none;animation:fadein .28s ease;}
+.section.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============================================================
+   SHARED COMPONENTS
+   ============================================================ */
+.rowbetween{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.sectionHead h2{font-family:var(--font-display);font-size:21px;font-weight:600;}
+.sectionHead p{color:var(--text-2);font-size:13px;margin-top:3px;}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.searchbox{position:relative;}
+.searchbox i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-2);font-size:12.5px;}
+.searchbox input{padding-left:32px;min-width:200px;}
+
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:22px;}
+.statcard{padding:19px 20px;position:relative;overflow:hidden;}
+.statcard .icn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:14px;}
+.statcard .lbl{font-size:12px;color:var(--text-2);margin-bottom:4px;}
+.statcard .val{font-family:var(--font-display);font-size:23px;font-weight:600;letter-spacing:-0.01em;}
+.statcard .delta{font-size:11.5px;margin-top:8px;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;}
+.delta.up{color:#7ee9bb;background:rgba(52,211,153,0.13);}
+.delta.down{color:#ffb3af;background:rgba(240,101,95,0.13);}
+.ic-em{background:rgba(52,211,153,0.14);color:var(--emerald);}
+.ic-gd{background:rgba(232,184,75,0.14);color:var(--gold);}
+.ic-bl{background:rgba(90,169,230,0.14);color:var(--blue);}
+.ic-rd{background:rgba(240,101,95,0.14);color:var(--red);}
+
+.chartpanel{padding:20px 22px;margin-bottom:20px;}
+.chartpanel .rowbetween{margin-bottom:14px;}
+.chartpanel h3{font-family:var(--font-display);font-size:15.5px;font-weight:600;}
+.chartrow{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;}
+@media (max-width:980px){.chartrow{grid-template-columns:1fr;}}
+.chart-wrap{position:relative;height:230px;}
+
+.tblwrap{overflow-x:auto;}
+table.datatable{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.datatable th{
+  text-align:left;color:var(--text-2);font-weight:600;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.04em;padding:0 14px 10px;
+  border-bottom:1px solid var(--panel-border);white-space:nowrap;
+}
+table.datatable td{padding:13px 14px;border-bottom:1px solid rgba(126,211,171,0.07);vertical-align:middle;}
+table.datatable tr:last-child td{border-bottom:none;}
+table.datatable tr:hover td{background:rgba(126,211,171,0.03);}
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block;}
+.pill-em{background:rgba(52,211,153,0.14);color:var(--emerald);}
+.pill-rd{background:rgba(240,101,95,0.14);color:#ff9d97;}
+.pill-gd{background:rgba(232,184,75,0.15);color:var(--gold);}
+.pill-gr{background:rgba(183,201,193,0.1);color:var(--text-1);}
+.rowactions{display:flex;gap:6px;}
+.iconsm{width:29px;height:29px;border-radius:8px;border:1px solid var(--panel-border);background:transparent;color:var(--text-1);display:inline-flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;}
+.iconsm:hover{color:var(--text-0);border-color:var(--panel-border-strong);}
+.iconsm.danger:hover{color:#ff9d97;border-color:rgba(240,101,95,0.4);}
+
+.emptystate{text-align:center;padding:52px 20px;color:var(--text-2);}
+.emptystate i{font-size:30px;margin-bottom:12px;opacity:.5;}
+.emptystate h4{color:var(--text-1);font-size:15px;margin-bottom:5px;font-family:var(--font-display);}
+.emptystate p{font-size:13px;margin-bottom:16px;}
+
+.progress-track{height:7px;border-radius:20px;background:rgba(126,211,171,0.1);overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--emerald),var(--gold));border-radius:20px;transition:width .5s ease;}
+
+.skel{background:linear-gradient(90deg,rgba(126,211,171,0.06) 25%,rgba(126,211,171,0.13) 37%,rgba(126,211,171,0.06) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:10px;}
+@keyframes skel{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+
+/* AI Advisor */
+.aigrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.aicard{padding:18px 19px;position:relative;}
+.aicard .aiTag{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.aicard .aiTag i{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--emerald),var(--gold));display:flex;align-items:center;justify-content:center;color:#08130f;font-size:11px;}
+.aicard .aiTag span{font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.aicard p{font-size:14px;line-height:1.55;color:var(--text-0);}
+
+/* Modal */
+#modalOverlay{position:fixed;inset:0;background:rgba(4,9,7,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s;padding:20px;}
+#modalOverlay.open{opacity:1;pointer-events:auto;}
+.modalBox{width:100%;max-width:460px;padding:26px 26px 22px;max-height:88vh;overflow-y:auto;transform:translateY(10px) scale(.98);transition:transform .18s;}
+#modalOverlay.open .modalBox{transform:translateY(0) scale(1);}
+.modalHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modalHead h3{font-family:var(--font-display);font-size:17.5px;}
+.modalClose{width:30px;height:30px;border-radius:9px;border:1px solid var(--panel-border);background:transparent;color:var(--text-1);display:flex;align-items:center;justify-content:center;}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+.formgrid .field.full{grid-column:1/-1;}
+.modalActions{display:flex;gap:10px;margin-top:6px;}
+.hint{font-size:11.5px;color:var(--text-2);margin-top:5px;}
+
+/* Toasts */
+#toastStack{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:10px;max-width:340px;}
+.toast{
+  padding:13px 15px;border-radius:12px;display:flex;align-items:flex-start;gap:10px;
+  font-size:13.5px;animation:toastin .25s ease;box-shadow:var(--shadow-2);
+}
+@keyframes toastin{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+.toast i{margin-top:1px;}
+.toast.success{background:#122a20;border:1px solid rgba(52,211,153,0.35);color:#c9f5df;}
+.toast.error{background:#2a1615;border:1px solid rgba(240,101,95,0.35);color:#ffd2cf;}
+.toast.info{background:#16232a;border:1px solid rgba(90,169,230,0.35);color:#cfe8fb;}
+
+/* Notifications dropdown */
+#notifDrop{position:absolute;top:52px;right:26px;width:330px;max-height:400px;overflow-y:auto;z-index:60;display:none;padding:8px;}
+#notifDrop.open{display:block;}
+.notifItem{padding:11px 12px;border-radius:10px;font-size:13px;color:var(--text-1);}
+.notifItem:hover{background:rgba(126,211,171,0.06);}
+.notifItem .t{color:var(--text-2);font-size:11px;margin-top:3px;}
+
+/* Loading overlay for whole app */
+#loadOverlay{position:fixed;inset:0;background:var(--bg-0);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(126,211,171,0.18);border-top-color:var(--emerald);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.mono{font-family:var(--font-mono);}
+.text-dim{color:var(--text-2);}
+.mb-0{margin-bottom:0 !important;}
+
+@media (max-width:560px){
+  .formgrid{grid-template-columns:1fr;}
+  #content{padding:16px;}
+  #topbar{padding:12px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOADING OVERLAY ================= -->
+<div id="loadOverlay">
+  <div class="spinner"></div>
+  <div style="font-family:var(--font-display);color:var(--text-1);font-size:13px;">Loading Business Growth Tracker…</div>
+</div>
+
+<!-- ================= AUTH SCREEN ================= -->
+<div id="authScreen" class="hidden">
+  <div id="authHero">
+    <div class="brandmark"><div class="mark">GT</div><span>Growth Tracker AI</span></div>
+    <div class="pitch">
+      <h1>Turn daily hustle into <span class="accent">lasting wealth.</span></h1>
+      <p>Track every business, every shilling, every goal — and let an AI advisor tell you exactly what to do next. Built for entrepreneurs running more than one thing at once.</p>
+      <svg class="growth-arc" viewBox="0 0 520 150" style="margin-top:26px;">
+        <defs>
+          <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#34d399"/>
+            <stop offset="100%" stop-color="#e8b84b"/>
+          </linearGradient>
+        </defs>
+        <polyline points="0,120 60,110 120,118 180,90 240,95 300,60 360,68 420,30 480,38 520,10"
+          fill="none" stroke="url(#arcGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <g fill="#e8b84b"><circle cx="520" cy="10" r="5"/></g>
+      </svg>
+    </div>
+    <div class="statrow">
+      <div class="stat"><b>12+</b><span>Trackable business types</span></div>
+      <div class="stat"><b>AI</b><span>Daily growth insights</span></div>
+      <div class="stat"><b>100%</b><span>Yours — self-hosted data</span></div>
+    </div>
+  </div>
+  <div id="authPane">
+    <!-- Login -->
+    <div id="loginCard" class="authCard glass">
+      <h2>Welcome back</h2>
+      <div class="sub">Log in to see how your businesses are doing.</div>
+      <div class="formErr" id="loginErr"></div>
+      <form id="loginForm">
+        <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" required></div>
+        <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required></div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Log in</button>
+      </form>
+      <div class="authSwitch">New here? <a href="#" id="showRegister">Create an account</a></div>
+    </div>
+    <!-- Register -->
+    <div id="registerCard" class="authCard glass hidden">
+      <h2>Start tracking growth</h2>
+      <div class="sub">Set up your account in under a minute.</div>
+      <div class="formErr" id="registerErr"></div>
+      <form id="registerForm">
+        <div class="field"><label>Full name</label><input type="text" id="regName" placeholder="Mumbere Darius" required></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="you@example.com" required></div>
+        <div class="field"><label>Password</label><input type="password" id="regPassword" placeholder="At least 6 characters" minlength="6" required></div>
+        <div class="field"><label>Currency</label>
+          <select id="regCurrency">
+            <option value="UGX" selected>UGX — Ugandan Shilling</option>
+            <option value="USD">USD — US Dollar</option>
+            <option value="KES">KES — Kenyan Shilling</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="registerBtn"><i class="fa-solid fa-rocket"></i> Create account</button>
+      </form>
+      <div class="authSwitch">Already have an account? <a href="#" id="showLogin">Log in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="app" class="hidden">
+  <aside id="sidebar">
+    <div class="brandmark"><div class="mark">GT</div><span>Growth Tracker</span></div>
+
+    <nav>
+      <div class="navgroup">
+        <a class="navlink active" data-section="dashboard"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+        <a class="navlink" data-section="businesses"><i class="fa-solid fa-building"></i>Businesses</a>
+        <a class="navlink" data-section="transactions"><i class="fa-solid fa-right-left"></i>Transactions</a>
+      </div>
+      <div class="navlabel">Wealth</div>
+      <div class="navgroup">
+        <a class="navlink" data-section="savings"><i class="fa-solid fa-piggy-bank"></i>Savings</a>
+        <a class="navlink" data-section="investments"><i class="fa-solid fa-chart-line"></i>Investments</a>
+        <a class="navlink" data-section="assets"><i class="fa-solid fa-vault"></i>Assets</a>
+        <a class="navlink" data-section="goals"><i class="fa-solid fa-bullseye"></i>Goals</a>
+      </div>
+      <div class="navlabel">Operations</div>
+      <div class="navgroup">
+        <a class="navlink" data-section="hotspots"><i class="fa-solid fa-wifi"></i>Hotspots</a>
+        <a class="navlink" data-section="ai"><i class="fa-solid fa-wand-magic-sparkles"></i>AI Advisor</a>
+        <a class="navlink" data-section="reports"><i class="fa-solid fa-file-lines"></i>Reports</a>
+      </div>
+      <div class="navlabel">Account</div>
+      <div class="navgroup">
+        <a class="navlink" data-section="settings"><i class="fa-solid fa-gear"></i>Settings</a>
+      </div>
+    </nav>
+
+    <div id="sidebarFooter">
+      <div class="userchip">
+        <div class="av" id="userAvatar">–</div>
+        <div class="info"><b id="userNameChip">–</b><span id="userCurrencyChip">–</span></div>
+      </div>
+      <a class="navlink" id="logoutBtn" style="margin-top:8px;color:#ff9d97;"><i class="fa-solid fa-right-from-bracket" style="color:#ff9d97;"></i>Log out</a>
+    </div>
+  </aside>
+
+  <div id="mainWrap">
+    <div id="topbar">
+      <button id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+      <div id="pageTitle">Dashboard<span id="pageSubtitle">Your business empire, at a glance</span></div>
+      <button class="iconbtn" id="notifBtn"><i class="fa-solid fa-bell"></i><span class="badge-dot hidden" id="notifDot"></span></button>
+    </div>
+
+    <div id="notifDrop" class="glass"></div>
+
+    <div id="content">
+
+      <!-- DASHBOARD -->
+      <section class="section active" id="section-dashboard">
+        <div class="cardgrid" id="dashCards"></div>
+        <div class="chartrow">
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Revenue vs Expenses (30 days)</h3></div>
+            <div class="chart-wrap"><canvas id="chartRevenue"></canvas></div>
+          </div>
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Daily Profit Trend</h3></div>
+            <div class="chart-wrap"><canvas id="chartProfit"></canvas></div>
+          </div>
+        </div>
+        <div class="chartrow">
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Savings Growth</h3></div>
+            <div class="chart-wrap"><canvas id="chartSavings"></canvas></div>
+          </div>
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Business Comparison</h3></div>
+            <div class="chart-wrap"><canvas id="chartCompare"></canvas></div>
+          </div>
+        </div>
+        <div class="chartpanel glass">
+          <div class="rowbetween"><h3><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold);margin-right:8px;"></i>Today's AI Insight</h3>
+            <button class="btn btn-ghost btn-sm" onclick="App.goSection('ai')">View all insights</button></div>
+          <div id="dashInsight" class="text-dim" style="font-size:14px;">Loading insight…</div>
+        </div>
+      </section>
+
+      <!-- BUSINESSES -->
+      <section class="section" id="section-businesses">
+        <div class="rowbetween sectionHead">
+          <div><h2>Businesses</h2><p>Every venture you run, in one place.</p></div>
+          <div class="toolbar">
+            <div class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="bizSearch" placeholder="Search businesses…"></div>
+            <button class="btn btn-primary" id="addBizBtn"><i class="fa-solid fa-plus"></i> Add business</button>
+          </div>
+        </div>
+        <div class="glass tblwrap" id="bizTableWrap"></div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="section" id="section-transactions">
+        <div class="rowbetween sectionHead">
+          <div><h2>Transactions</h2><p>Daily revenue and expenses across every business.</p></div>
+          <div class="toolbar">
+            <select id="txFilterBiz" class="field" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(8,16,13,.55);color:var(--text-0);font-size:13px;"></select>
+            <select id="txFilterType" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(8,16,13,.55);color:var(--text-0);font-size:13px;">
+              <option value="">All types</option><option value="revenue">Revenue</option><option value="expense">Expense</option>
+            </select>
+            <button class="btn btn-primary" id="addTxBtn"><i class="fa-solid fa-plus"></i> Add transaction</button>
+          </div>
+        </div>
+        <div class="glass tblwrap" id="txTableWrap"></div>
+      </section>
+
+      <!-- SAVINGS -->
+      <section class="section" id="section-savings">
+        <div class="rowbetween sectionHead">
+          <div><h2>Smart Savings</h2><p>Set a percentage of profit aside, every time.</p></div>
+          <button class="btn btn-primary" id="addSavingsBtn"><i class="fa-solid fa-plus"></i> Record savings</button>
+        </div>
+        <div class="cardgrid" id="savingsCards"></div>
+        <div class="chartpanel glass">
+          <h3 style="margin-bottom:14px;">Savings balance over time</h3>
+          <div class="chart-wrap"><canvas id="chartSavingsHistory"></canvas></div>
+        </div>
+        <div class="glass tblwrap" id="savingsTableWrap"></div>
+      </section>
+
+      <!-- HOTSPOTS -->
+      <section class="section" id="section-hotspots">
+        <div class="rowbetween sectionHead">
+          <div><h2>Hotspot Business</h2><p>Track installations, ROI, and expansion projections.</p></div>
+          <button class="btn btn-primary" id="addHotspotBtn"><i class="fa-solid fa-plus"></i> Add hotspot</button>
+        </div>
+        <div class="cardgrid" id="hotspotProjectionCards"></div>
+        <div class="glass tblwrap" id="hotspotTableWrap"></div>
+      </section>
+
+      <!-- INVESTMENTS -->
+      <section class="section" id="section-investments">
+        <div class="rowbetween sectionHead">
+          <div><h2>Investments</h2><p>Equipment and capital purchases that grow your businesses.</p></div>
+          <button class="btn btn-primary" id="addInvBtn"><i class="fa-solid fa-plus"></i> Add investment</button>
+        </div>
+        <div class="glass tblwrap" id="invTableWrap"></div>
+      </section>
+
+      <!-- ASSETS -->
+      <section class="section" id="section-assets">
+        <div class="rowbetween sectionHead">
+          <div><h2>Assets</h2><p>What you own, and what it's worth today.</p></div>
+          <button class="btn btn-primary" id="addAssetBtn"><i class="fa-solid fa-plus"></i> Add asset</button>
+        </div>
+        <div class="glass tblwrap" id="assetTableWrap"></div>
+      </section>
+
+      <!-- GOALS -->
+      <section class="section" id="section-goals">
+        <div class="rowbetween sectionHead">
+          <div><h2>Financial Goals</h2><p>Name the target. Watch the progress.</p></div>
+          <button class="btn btn-primary" id="addGoalBtn"><i class="fa-solid fa-plus"></i> Add goal</button>
+        </div>
+        <div class="aigrid" id="goalsGrid"></div>
+      </section>
+
+      <!-- AI ADVISOR -->
+      <section class="section" id="section-ai">
+        <div class="rowbetween sectionHead">
+          <div><h2>AI Business Advisor</h2><p>Personalized insights based on your real numbers.</p></div>
+          <button class="btn btn-gold" id="refreshAiBtn"><i class="fa-solid fa-arrows-rotate"></i> Refresh insights</button>
+        </div>
+        <div class="aigrid" id="aiInsightsGrid"></div>
+        <div class="chartpanel glass" style="margin-top:20px;">
+          <h3 style="margin-bottom:14px;">Insight history</h3>
+          <div id="aiHistoryList"></div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section class="section" id="section-reports">
+        <div class="rowbetween sectionHead">
+          <div><h2>Reports</h2><p>Summarized performance, exportable anytime.</p></div>
+          <div class="toolbar">
+            <select id="reportPeriod" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(8,16,13,.55);color:var(--text-0);font-size:13px;">
+              <option value="daily">Daily</option><option value="weekly">Weekly</option>
+              <option value="monthly" selected>Monthly</option><option value="yearly">Yearly</option>
+            </select>
+            <button class="btn btn-ghost" id="exportCsvBtn"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button class="btn btn-ghost" id="printReportBtn"><i class="fa-solid fa-print"></i> Print / PDF</button>
+          </div>
+        </div>
+        <div class="cardgrid" id="reportCards"></div>
+        <div class="glass tblwrap" id="reportTableWrap"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="section" id="section-settings">
+        <div class="sectionHead" style="margin-bottom:20px;"><h2>Settings</h2><p>Your profile and connection preferences.</p></div>
+        <div class="glass" style="padding:24px;max-width:480px;margin-bottom:18px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:16px;font-size:15.5px;">Profile</h3>
+          <div class="field"><label>Full name</label><input type="text" id="setName"></div>
+          <div class="field"><label>Currency</label>
+            <select id="setCurrency">
+              <option value="UGX">UGX — Ugandan Shilling</option><option value="USD">USD — US Dollar</option>
+              <option value="KES">KES — Kenyan Shilling</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — British Pound</option>
+            </select>
+          </div>
+          <div class="field"><label>New password <span class="text-dim">(leave blank to keep current)</span></label><input type="password" id="setPassword" placeholder="••••••••"></div>
+          <button class="btn btn-primary" id="saveProfileBtn"><i class="fa-solid fa-check"></i> Save changes</button>
+        </div>
+        <div class="glass" style="padding:24px;max-width:480px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:6px;font-size:15.5px;">API connection</h3>
+          <p class="hint" style="margin-bottom:14px;">Point this app at your deployed backend (Render, etc.). Stored only in this browser.</p>
+          <div class="field"><label>Backend API base URL</label><input type="text" id="setApiBase" placeholder="https://your-backend.onrender.com"></div>
+          <button class="btn btn-ghost" id="saveApiBaseBtn"><i class="fa-solid fa-plug"></i> Save & reconnect</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="modalOverlay">
+  <div class="modalBox glass" id="modalBox">
+    <div class="modalHead"><h3 id="modalTitle">Title</h3><button class="modalClose" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ================= TOASTS ================= -->
+<div id="toastStack"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   PERSISTENT-ISH STORAGE (localStorage with in-memory fallback,
+   so the app still works even where localStorage is blocked)
+   ============================================================ */
+const memStore = {};
+const Store = {
+  get(k){ try{ const v = localStorage.getItem(k); return v===null ? memStore[k] ?? null : v; }catch(e){ return memStore[k] ?? null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ memStore[k]=v; } },
+  remove(k){ try{ localStorage.removeItem(k); }catch(e){ delete memStore[k]; } }
+};
+
+/* ============================================================
+   CONFIG / STATE
+   ============================================================ */
+const State = {
+  apiBase: Store.get('gt_api_base') || 'http://127.0.0.1:8000',
+  token: Store.get('gt_token') || null,
+  user: JSON.parse(Store.get('gt_user') || 'null'),
+  businesses: [],
+  charts: {},
+};
+
+function fmtMoney(n){
+  n = Number(n||0);
+  const cur = (State.user && State.user.currency) || 'UGX';
+  try{
+    return new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n) + ' ' + cur;
+  }catch(e){ return n.toFixed(0) + ' ' + cur; }
+}
+function fmtDate(d){
+  if(!d) return '—';
+  const dt = new Date(d);
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDateTime(d){
+  const dt = new Date(d);
+  if(isNaN(dt)) return d;
+  return dt.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============================================================
+   TOASTS
+   ============================================================ */
+function toast(msg, type){
+  type = type || 'info';
+  const icon = type==='success' ? 'fa-circle-check' : type==='error' ? 'fa-circle-exclamation' : 'fa-circle-info';
+  const el = document.createElement('div');
+  el.className = 'toast '+type;
+  el.innerHTML = `<i class="fa-solid ${icon}"></i><div>${esc(msg)}</div>`;
+  document.getElementById('toastStack').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(30px)'; el.style.transition='all .25s'; setTimeout(()=>el.remove(),260); }, 3800);
+}
+
+/* ============================================================
+   API WRAPPER
+   ============================================================ */
+async function api(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if(State.token) headers['Authorization'] = 'Bearer ' + State.token;
+  let res, data;
+  try{
+    res = await fetch(State.apiBase + path, {
+      method: opts.method || 'GET',
+      headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+  }catch(networkErr){
+    toast('Cannot reach the backend at ' + State.apiBase + '. Check Settings → API connection.', 'error');
+    throw networkErr;
+  }
+  const text = await res.text();
+  try{ data = text ? JSON.parse(text) : null; }catch(e){ data = null; }
+
+  if(res.status === 401 && path !== '/login'){
+    logout(true);
+    throw new Error('Session expired');
+  }
+  if(!res.ok){
+    const msg = (data && (data.detail ? (typeof data.detail==='string'?data.detail:JSON.stringify(data.detail)) : data.message)) || ('Request failed (' + res.status + ')');
+    toast(msg, 'error');
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/* ============================================================
+   MODAL SYSTEM
+   ============================================================ */
+const Modal = {
+  open(title, bodyHtml, onMount){
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('modalOverlay').classList.add('open');
+    if(onMount) onMount();
+  },
+  close(){ document.getElementById('modalOverlay').classList.remove('open'); }
+};
+document.getElementById('modalCloseBtn').onclick = Modal.close;
+document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') Modal.close(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') Modal.close(); });
+
+/* ============================================================
+   AUTH FLOWS
+   ============================================================ */
+function showAuthScreen(){
+  document.getElementById('loadOverlay').classList.add('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('authScreen').classList.remove('hidden');
+}
+function showApp(){
+  document.getElementById('loadOverlay').classList.add('hidden');
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userNameChip').textContent = State.user.full_name;
+  document.getElementById('userCurrencyChip').textContent = State.user.currency + ' account';
+  document.getElementById('userAvatar').textContent = (State.user.full_name||'?').trim().charAt(0).toUpperCase();
+  App.goSection('dashboard');
+  App.loadAllInitialData();
+}
+
+document.getElementById('showRegister').onclick = e=>{ e.preventDefault(); document.getElementById('loginCard').classList.add('hidden'); document.getElementById('registerCard').classList.remove('hidden'); };
+document.getElementById('showLogin').onclick = e=>{ e.preventDefault(); document.getElementById('registerCard').classList.add('hidden'); document.getElementById('loginCard').classList.remove('hidden'); };
+
+document.getElementById('loginForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const errBox = document.getElementById('loginErr'); errBox.style.display='none';
+  const btn = document.getElementById('loginBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in…';
+  try{
+    const data = await api('/login', {method:'POST', body:{
+      email: document.getElementById('loginEmail').value.trim(),
+      password: document.getElementById('loginPassword').value,
+    }});
+    setSession(data);
+    toast('Welcome back, ' + data.user.full_name.split(' ')[0] + '!', 'success');
+    showApp();
+  }catch(err){
+    errBox.textContent = err.message || 'Login failed.'; errBox.style.display='block';
+  }finally{
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Log in';
+  }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const errBox = document.getElementById('registerErr'); errBox.style.display='none';
+  const btn = document.getElementById('registerBtn'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account…';
+  try{
+    const data = await api('/register', {method:'POST', body:{
+      full_name: document.getElementById('regName').value.trim(),
+      email: document.getElementById('regEmail').value.trim(),
+      password: document.getElementById('regPassword').value,
+      currency: document.getElementById('regCurrency').value,
+    }});
+    setSession(data);
+    toast('Account created. Let\'s build something great.', 'success');
+    showApp();
+  }catch(err){
+    errBox.textContent = err.message || 'Registration failed.'; errBox.style.display='block';
+  }finally{
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Create account';
+  }
+});
+
+function setSession(data){
+  State.token = data.access_token;
+  State.user = data.user;
+  Store.set('gt_token', data.access_token);
+  Store.set('gt_user', JSON.stringify(data.user));
+}
+function logout(silent){
+  State.token = null; State.user = null;
+  Store.remove('gt_token'); Store.remove('gt_user');
+  if(!silent) toast('Logged out.', 'info');
+  showAuthScreen();
+}
+document.getElementById('logoutBtn').onclick = ()=>logout(false);
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+const SECTION_TITLES = {
+  dashboard: ['Dashboard','Your business empire, at a glance'],
+  businesses: ['Businesses','Manage every venture you run'],
+  transactions: ['Transactions','Daily revenue and expenses'],
+  savings: ['Smart Savings','Build your safety net automatically'],
+  hotspots: ['Hotspot Business','Installations, ROI and growth projections'],
+  investments: ['Investments','Capital that compounds'],
+  assets: ['Assets','What you own, and what it is worth'],
+  goals: ['Financial Goals','Name it. Track it. Hit it.'],
+  ai: ['AI Advisor','Insights from your real numbers'],
+  reports: ['Reports','Performance summaries, exportable anytime'],
+  settings: ['Settings','Profile & connection preferences'],
+};
+
+const App = {
+  goSection(name){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('section-'+name).classList.add('active');
+    document.querySelectorAll('.navlink[data-section]').forEach(a=>a.classList.toggle('active', a.dataset.section===name));
+    document.getElementById('pageTitle').innerHTML = SECTION_TITLES[name][0] + '<span>'+SECTION_TITLES[name][1]+'</span>';
+    document.getElementById('sidebar').classList.remove('open');
+    App.loadSection(name);
+  },
+  loadSection(name){
+    if(name==='dashboard') Dash.load();
+    else if(name==='businesses') Biz.load();
+    else if(name==='transactions') Tx.load();
+    else if(name==='savings') Sav.load();
+    else if(name==='hotspots') Hot.load();
+    else if(name==='investments') Inv.load();
+    else if(name==='assets') Asset.load();
+    else if(name==='goals') Goal.load();
+    else if(name==='ai') AI.load();
+    else if(name==='reports') Rep.load();
+    else if(name==='settings') Settings.load();
+  },
+  async loadAllInitialData(){
+    try{ State.businesses = await api('/businesses'); }catch(e){ State.businesses = []; }
+    Notif.poll();
+  }
+};
+document.querySelectorAll('.navlink[data-section]').forEach(a=>{
+  a.addEventListener('click', ()=>App.goSection(a.dataset.section));
+});
+document.getElementById('menuToggle').onclick = ()=>document.getElementById('sidebar').classList.toggle('open');
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+const Notif = {
+  async poll(){
+    try{
+      const list = await api('/notifications?unread_only=true');
+      document.getElementById('notifDot').classList.toggle('hidden', !(list && list.length));
+      Notif._list = list;
+    }catch(e){}
+  },
+  async toggle(){
+    const drop = document.getElementById('notifDrop');
+    if(drop.classList.contains('open')){ drop.classList.remove('open'); return; }
+    const all = await api('/notifications');
+    if(!all.length){
+      drop.innerHTML = '<div class="emptystate" style="padding:26px 10px;"><i class="fa-solid fa-bell-slash"></i><p class="mb-0">No notifications yet.</p></div>';
+    }else{
+      drop.innerHTML = all.map(n=>`<div class="notifItem"><div>${esc(n.message)}</div><div class="t">${fmtDateTime(n.created_at)}</div></div>`).join('');
+      all.filter(n=>!n.is_read).forEach(n=>api('/notifications/'+n.id+'/read',{method:'PUT'}).catch(()=>{}));
+      document.getElementById('notifDot').classList.add('hidden');
+    }
+    drop.classList.add('open');
+  }
+};
+document.getElementById('notifBtn').onclick = ()=>Notif.toggle();
+document.addEventListener('click', e=>{
+  const drop = document.getElementById('notifDrop');
+  if(drop.classList.contains('open') && !drop.contains(e.target) && e.target.id!=='notifBtn' && !e.target.closest('#notifBtn')) drop.classList.remove('open');
+});
+
+/* ============================================================
+   CHART HELPERS
+   ============================================================ */
+const chartsAvailable = typeof Chart !== 'undefined';
+if(chartsAvailable){
+  Chart.defaults.color = '#7c9089';
+  Chart.defaults.font.family = "'Inter',sans-serif";
+  Chart.defaults.borderColor = 'rgba(126,211,171,0.09)';
+} else {
+  console.warn('Chart.js failed to load from CDN — charts will be skipped.');
+}
+
+function destroyChart(key){ if(State.charts[key]){ State.charts[key].destroy(); delete State.charts[key]; } }
+
+function lineChart(canvasId, key, labels, datasets){
+  if(!chartsAvailable) return;
+  destroyChart(key);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  State.charts[key] = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{ legend:{ labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, padding:14 } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:10.5}} },
+        y:{ grid:{color:'rgba(126,211,171,0.07)'}, ticks:{font:{size:10.5}, callback:v=>{ if(Math.abs(v)>=1000000) return (v/1000000)+'M'; if(Math.abs(v)>=1000) return (v/1000)+'k'; return v; } } }
+      }
+    }
+  });
+}
+function barChart(canvasId, key, labels, data, colors){
+  destroyChart(key);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  State.charts[key] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data, backgroundColor: colors || '#34d399', borderRadius:8, maxBarThickness:44 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{size:10.5}} },
+        y:{ grid:{color:'rgba(126,211,171,0.07)'}, ticks:{font:{size:10.5}, callback:v=>{ if(Math.abs(v)>=1000000) return (v/1000000)+'M'; if(Math.abs(v)>=1000) return (v/1000)+'k'; return v; } } }
+      }
+    }
+  });
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+const Dash = {
+  async load(){
+    const grid = document.getElementById('dashCards');
+    grid.innerHTML = Array(8).fill('<div class="statcard glass"><div class="skel" style="height:70px;"></div></div>').join('');
+    let d;
+    try{ d = await api('/dashboard'); }catch(e){ return; }
+
+    const cards = [
+      {lbl:"Today's Revenue", val:d.today_revenue, icn:'fa-sun', cls:'ic-em'},
+      {lbl:"Today's Profit", val:d.today_profit, icn:'fa-coins', cls:'ic-gd'},
+      {lbl:'Monthly Revenue', val:d.monthly_revenue, icn:'fa-chart-simple', cls:'ic-bl'},
+      {lbl:'Monthly Profit', val:d.monthly_profit, icn:'fa-sack-dollar', cls:'ic-em', delta:d.monthly_growth_percent},
+      {lbl:'Savings Balance', val:d.savings_balance, icn:'fa-piggy-bank', cls:'ic-gd'},
+      {lbl:'Total Investments', val:d.total_investments, icn:'fa-chart-line', cls:'ic-bl'},
+      {lbl:'Total Assets', val:d.total_assets, icn:'fa-vault', cls:'ic-gd'},
+      {lbl:'Net Worth', val:d.net_worth, icn:'fa-crown', cls:'ic-em'},
+      {lbl:'Businesses', val:d.business_count, icn:'fa-building', cls:'ic-bl', raw:true},
+      {lbl:'Active Goals', val:d.active_goals, icn:'fa-bullseye', cls:'ic-rd', raw:true},
+    ];
+    grid.innerHTML = cards.map(c=>`
+      <div class="statcard glass">
+        <div class="icn ${c.cls}"><i class="fa-solid ${c.icn}"></i></div>
+        <div class="lbl">${c.lbl}</div>
+        <div class="val">${c.raw ? c.val : fmtMoney(c.val)}</div>
+        ${c.delta!==undefined ? `<span class="delta ${c.delta>=0?'up':'down'}"><i class="fa-solid ${c.delta>=0?'fa-arrow-up':'fa-arrow-down'}"></i> ${Math.abs(c.delta)}% vs last month</span>` : ''}
+      </div>`).join('');
+
+    let charts;
+    try{ charts = await api('/dashboard/charts?days=30'); }catch(e){ charts = null; }
+    if(charts){
+      const labels = charts.labels.map(l=>l.slice(5));
+      lineChart('chartRevenue','dashRev', labels, [
+        {label:'Revenue', data:charts.revenue, borderColor:'#34d399', backgroundColor:'rgba(52,211,153,0.12)', fill:true, tension:.35, pointRadius:0, borderWidth:2},
+        {label:'Expense', data:charts.expense, borderColor:'#f0655f', backgroundColor:'rgba(240,101,95,0.08)', fill:true, tension:.35, pointRadius:0, borderWidth:2},
+      ]);
+      lineChart('chartProfit','dashProfit', labels, [
+        {label:'Profit', data:charts.profit, borderColor:'#e8b84b', backgroundColor:'rgba(232,184,75,0.12)', fill:true, tension:.35, pointRadius:0, borderWidth:2},
+      ]);
+      lineChart('chartSavings','dashSavings', labels, [
+        {label:'Savings balance', data:charts.savings_growth, borderColor:'#5aa9e6', backgroundColor:'rgba(90,169,230,0.12)', fill:true, tension:.35, pointRadius:0, borderWidth:2},
+      ]);
+      const comp = charts.business_comparison || [];
+      barChart('chartCompare','dashCompare', comp.map(c=>c.name), comp.map(c=>c.profit), ['#34d399','#e8b84b','#5aa9e6','#f0655f','#9b8cf2']);
+    }
+
+    try{
+      const advice = await api('/ai/advice');
+      document.getElementById('dashInsight').textContent = advice.insights[0] || 'No insight yet — add some transactions first.';
+    }catch(e){
+      document.getElementById('dashInsight').textContent = 'Insights will appear once you have some transaction history.';
+    }
+  }
+};
+
+/* ============================================================
+   GENERIC TABLE / FORM HELPERS
+   ============================================================ */
+function emptyRow(colspan, icon, title, sub, btnLabel, btnId){
+  return `<tr><td colspan="${colspan}"><div class="emptystate">
+    <i class="fa-solid ${icon}"></i><h4>${title}</h4><p>${sub}</p>
+    ${btnLabel? `<button class="btn btn-primary btn-sm" id="${btnId}"><i class="fa-solid fa-plus"></i> ${btnLabel}</button>` : ''}
+  </div></td></tr>`;
+}
+function bizOptions(selectedId){
+  return State.businesses.map(b=>`<option value="${b.id}" ${String(b.id)===String(selectedId)?'selected':''}>${esc(b.name)}</option>`).join('');
+}
+
+/* ============================================================
+   BUSINESSES
+   ============================================================ */
+const Biz = {
+  data: [],
+  async load(){
+    const wrap = document.getElementById('bizTableWrap');
+    wrap.innerHTML = '<div style="padding:20px;"><div class="skel" style="height:180px;"></div></div>';
+    try{ Biz.data = await api('/businesses'); State.businesses = Biz.data; }catch(e){ Biz.data = []; }
+    Biz.render();
+  },
+  render(){
+    const search = (document.getElementById('bizSearch').value||'').toLowerCase();
+    const rows = Biz.data.filter(b=>b.name.toLowerCase().includes(search));
+    const wrap = document.getElementById('bizTableWrap');
+    if(!rows.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-building','No businesses yet','Add your first venture — hotspot, printing, farming, anything.','Add business','emptyAddBiz')}</tbody></table>`;
+      document.getElementById('emptyAddBiz')?.addEventListener('click', Biz.openCreate);
+      return;
+    }
+    wrap.innerHTML = `<table class="datatable"><thead><tr>
+      <th>Name</th><th>Category</th><th>Started</th><th>Status</th><th></th>
+    </tr></thead><tbody>
+      ${rows.map(b=>`<tr>
+        <td><b>${esc(b.name)}</b>${b.description?`<div class="text-dim" style="font-size:11.5px;margin-top:2px;">${esc(b.description)}</div>`:''}</td>
+        <td>${esc(b.category)}</td>
+        <td>${fmtDate(b.start_date)}</td>
+        <td><span class="pill ${b.status==='active'?'pill-em':'pill-gr'}">${esc(b.status)}</span></td>
+        <td><div class="rowactions">
+          <button class="iconsm" onclick="Biz.openEdit(${b.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="iconsm danger" onclick="Biz.remove(${b.id})"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Add business', `
+      <div class="formgrid">
+        <div class="field full"><label>Business name</label><input type="text" id="f_name" placeholder="e.g. Hotspot Business" required></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" placeholder="e.g. Internet" value="General"></div>
+        <div class="field"><label>Start date</label><input type="date" id="f_start"></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" placeholder="Optional notes"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save business</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        const name = document.getElementById('f_name').value.trim();
+        if(!name) return toast('Business name is required.', 'error');
+        await api('/businesses', {method:'POST', body:{
+          name, category: document.getElementById('f_category').value.trim() || 'General',
+          start_date: document.getElementById('f_start').value || null,
+          description: document.getElementById('f_desc').value.trim(),
+        }});
+        toast('Business added.', 'success'); Modal.close(); Biz.load();
+      };
+    });
+  },
+  openEdit(id){
+    const b = Biz.data.find(x=>x.id===id); if(!b) return;
+    Modal.open('Edit business', `
+      <div class="formgrid">
+        <div class="field full"><label>Business name</label><input type="text" id="f_name" value="${esc(b.name)}"></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" value="${esc(b.category)}"></div>
+        <div class="field"><label>Status</label><select id="f_status">
+          <option value="active" ${b.status==='active'?'selected':''}>Active</option>
+          <option value="paused" ${b.status==='paused'?'selected':''}>Paused</option>
+          <option value="closed" ${b.status==='closed'?'selected':''}>Closed</option>
+        </select></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" value="${esc(b.description)}"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        await api('/businesses/'+id, {method:'PUT', body:{
+          name: document.getElementById('f_name').value.trim(),
+          category: document.getElementById('f_category').value.trim(),
+          status: document.getElementById('f_status').value,
+          description: document.getElementById('f_desc').value.trim(),
+        }});
+        toast('Business updated.', 'success'); Modal.close(); Biz.load();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this business and all its transactions? This cannot be undone.')) return;
+    await api('/businesses/'+id, {method:'DELETE'});
+    toast('Business deleted.', 'success'); Biz.load();
+  }
+};
+document.getElementById('addBizBtn').onclick = Biz.openCreate;
+document.getElementById('bizSearch').addEventListener('input', Biz.render);
+
+/* ============================================================
+   TRANSACTIONS
+   ============================================================ */
+const Tx = {
+  data: [],
+  async load(){
+    const bizSel = document.getElementById('txFilterBiz');
+    bizSel.innerHTML = '<option value="">All businesses</option>' + bizOptions();
+    const wrap = document.getElementById('txTableWrap');
+    wrap.innerHTML = '<div style="padding:20px;"><div class="skel" style="height:220px;"></div></div>';
+    await Tx.fetch();
+  },
+  async fetch(){
+    const biz = document.getElementById('txFilterBiz').value;
+    const type = document.getElementById('txFilterType').value;
+    let q = '/transactions?limit=150';
+    if(biz) q += '&business_id='+biz;
+    if(type) q += '&type='+type;
+    try{ Tx.data = await api(q); }catch(e){ Tx.data = []; }
+    Tx.render();
+  },
+  render(){
+    const wrap = document.getElementById('txTableWrap');
+    if(!Tx.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-right-left','No transactions yet','Record your first sale or expense to start tracking profit.','Add transaction','emptyAddTx')}</tbody></table>`;
+      document.getElementById('emptyAddTx')?.addEventListener('click', Tx.openCreate);
+      return;
+    }
+    const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '—';
+    wrap.innerHTML = `<table class="datatable"><thead><tr>
+      <th>Date</th><th>Business</th><th>Type</th><th>Category</th><th>Description</th><th style="text-align:right;">Amount</th><th></th>
+    </tr></thead><tbody>
+      ${Tx.data.map(t=>`<tr>
+        <td>${fmtDate(t.date)}</td>
+        <td>${esc(bizName(t.business_id))}</td>
+        <td><span class="pill ${t.type==='revenue'?'pill-em':'pill-rd'}">${t.type}</span></td>
+        <td>${esc(t.category)}</td>
+        <td class="text-dim">${esc(t.description)||'—'}</td>
+        <td style="text-align:right;font-family:var(--font-mono);color:${t.type==='revenue'?'var(--emerald)':'#ff9d97'}">${t.type==='revenue'?'+':'−'}${fmtMoney(t.amount)}</td>
+        <td><div class="rowactions">
+          <button class="iconsm" onclick="Tx.openEdit(${t.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="iconsm danger" onclick="Tx.remove(${t.id})"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    if(!State.businesses.length) return toast('Add a business first.', 'error');
+    Modal.open('Add transaction', `
+      <div class="formgrid">
+        <div class="field full"><label>Business</label><select id="f_biz">${bizOptions()}</select></div>
+        <div class="field"><label>Type</label><select id="f_type"><option value="revenue">Revenue</option><option value="expense">Expense</option></select></div>
+        <div class="field"><label>Amount</label><input type="number" id="f_amount" min="0" step="1" placeholder="0"></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" placeholder="e.g. Sales, Transport" value="Other"></div>
+        <div class="field"><label>Date</label><input type="date" id="f_date"></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save transaction</button></div>
+    `, ()=>{
+      document.getElementById('f_date').valueAsDate = new Date();
+      document.getElementById('f_submit').onclick = async ()=>{
+        const amount = parseFloat(document.getElementById('f_amount').value);
+        if(!amount || amount<=0) return toast('Enter a valid amount.', 'error');
+        await api('/transactions', {method:'POST', body:{
+          business_id: parseInt(document.getElementById('f_biz').value),
+          type: document.getElementById('f_type').value,
+          amount, category: document.getElementById('f_category').value.trim() || 'Other',
+          description: document.getElementById('f_desc').value.trim(),
+          date: document.getElementById('f_date').value || null,
+        }});
+        toast('Transaction recorded.', 'success'); Modal.close(); Tx.fetch(); Notif.poll();
+      };
+    });
+  },
+  openEdit(id){
+    const t = Tx.data.find(x=>x.id===id); if(!t) return;
+    Modal.open('Edit transaction', `
+      <div class="formgrid">
+        <div class="field"><label>Type</label><select id="f_type"><option value="revenue" ${t.type==='revenue'?'selected':''}>Revenue</option><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option></select></div>
+        <div class="field"><label>Amount</label><input type="number" id="f_amount" value="${t.amount}"></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" value="${esc(t.category)}"></div>
+        <div class="field"><label>Date</label><input type="date" id="f_date" value="${t.date}"></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" value="${esc(t.description)}"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        await api('/transactions/'+id, {method:'PUT', body:{
+          type: document.getElementById('f_type').value,
+          amount: parseFloat(document.getElementById('f_amount').value),
+          category: document.getElementById('f_category').value.trim(),
+          description: document.getElementById('f_desc').value.trim(),
+          date: document.getElementById('f_date').value,
+        }});
+        toast('Transaction updated.', 'success'); Modal.close(); Tx.fetch();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this transaction?')) return;
+    await api('/transactions/'+id, {method:'DELETE'});
+    toast('Transaction deleted.', 'success'); Tx.fetch();
+  }
+};
+document.getElementById('addTxBtn').onclick = Tx.openCreate;
+document.getElementById('txFilterBiz').addEventListener('change', Tx.fetch);
+document.getElementById('txFilterType').addEventListener('change', Tx.fetch);
+
+/* ============================================================
+   SAVINGS
+   ============================================================ */
+const Sav = {
+  data: [],
+  async load(){
+    document.getElementById('savingsCards').innerHTML = Array(3).fill('<div class="statcard glass"><div class="skel" style="height:60px;"></div></div>').join('');
+    document.getElementById('savingsTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:160px;"></div></div>';
+    try{ Sav.data = await api('/savings'); }catch(e){ Sav.data = []; }
+    Sav.render();
+  },
+  render(){
+    const balance = Sav.data.reduce((s,r)=>s+r.amount_saved,0);
+    const totalProfit = Sav.data.reduce((s,r)=>s+r.profit_amount,0);
+    const avgPct = Sav.data.length ? (Sav.data.reduce((s,r)=>s+r.percentage,0)/Sav.data.length) : 0;
+    document.getElementById('savingsCards').innerHTML = `
+      <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-piggy-bank"></i></div><div class="lbl">Savings Balance</div><div class="val">${fmtMoney(balance)}</div></div>
+      <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-sack-dollar"></i></div><div class="lbl">Total Profit Saved From</div><div class="val">${fmtMoney(totalProfit)}</div></div>
+      <div class="statcard glass"><div class="icn ic-bl"><i class="fa-solid fa-percent"></i></div><div class="lbl">Average Save Rate</div><div class="val">${avgPct.toFixed(0)}%</div></div>
+    `;
+    const sorted = [...Sav.data].sort((a,b)=> new Date(a.date)-new Date(b.date));
+    lineChart('chartSavingsHistory','savHistory', sorted.map(r=>fmtDate(r.date)), [
+      {label:'Balance', data:sorted.map(r=>r.balance_after), borderColor:'#e8b84b', backgroundColor:'rgba(232,184,75,0.12)', fill:true, tension:.3, pointRadius:2, borderWidth:2}
+    ]);
+    const wrap = document.getElementById('savingsTableWrap');
+    if(!Sav.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-piggy-bank','No savings recorded yet','Set aside a percentage of profit and watch your balance grow.','Record savings','emptyAddSav')}</tbody></table>`;
+      document.getElementById('emptyAddSav')?.addEventListener('click', Sav.openCreate);
+      return;
+    }
+    wrap.innerHTML = `<table class="datatable"><thead><tr>
+      <th>Date</th><th>Profit</th><th>%</th><th>Saved</th><th>Remaining cash</th><th>Balance after</th><th>Note</th>
+    </tr></thead><tbody>
+      ${[...Sav.data].reverse().map(r=>`<tr>
+        <td>${fmtDate(r.date)}</td><td>${fmtMoney(r.profit_amount)}</td><td>${r.percentage}%</td>
+        <td style="color:var(--gold);font-family:var(--font-mono);">${fmtMoney(r.amount_saved)}</td>
+        <td>${fmtMoney(r.remaining_cash)}</td><td><b>${fmtMoney(r.balance_after)}</b></td>
+        <td class="text-dim">${esc(r.note)||'—'}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Record savings', `
+      <div class="formgrid">
+        <div class="field full"><label>Profit amount</label><input type="number" id="f_profit" placeholder="e.g. 50000"></div>
+        <div class="field full"><label>Percentage to save: <b id="pctLabel">50%</b></label>
+          <input type="range" id="f_pct" min="0" max="100" value="50" style="width:100%;accent-color:var(--emerald);">
+        </div>
+        <div class="field full" id="calcPreview" style="font-size:13px;color:var(--text-1);background:rgba(126,211,171,0.06);padding:10px 12px;border-radius:9px;">Enter a profit amount to preview the split.</div>
+        <div class="field full"><label>Note</label><input type="text" id="f_note" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save</button></div>
+    `, ()=>{
+      const update = ()=>{
+        const profit = parseFloat(document.getElementById('f_profit').value)||0;
+        const pct = parseFloat(document.getElementById('f_pct').value);
+        document.getElementById('pctLabel').textContent = pct+'%';
+        const saved = profit*(pct/100), remain = profit-saved;
+        document.getElementById('calcPreview').innerHTML = `Save <b style="color:var(--gold)">${fmtMoney(saved)}</b> &nbsp;•&nbsp; Keep <b style="color:var(--emerald)">${fmtMoney(remain)}</b> as cash`;
+      };
+      document.getElementById('f_profit').addEventListener('input', update);
+      document.getElementById('f_pct').addEventListener('input', update);
+      document.getElementById('f_submit').onclick = async ()=>{
+        const profit = parseFloat(document.getElementById('f_profit').value);
+        if(!profit || profit<=0) return toast('Enter a valid profit amount.', 'error');
+        await api('/savings', {method:'POST', body:{
+          profit_amount: profit, percentage: parseFloat(document.getElementById('f_pct').value),
+          note: document.getElementById('f_note').value.trim(),
+        }});
+        toast('Savings recorded.', 'success'); Modal.close(); Sav.load(); Notif.poll();
+      };
+    });
+  }
+};
+document.getElementById('addSavingsBtn').onclick = Sav.openCreate;
+
+/* ============================================================
+   HOTSPOTS
+   ============================================================ */
+const Hot = {
+  data: [],
+  async load(){
+    document.getElementById('hotspotProjectionCards').innerHTML = Array(4).fill('<div class="statcard glass"><div class="skel" style="height:60px;"></div></div>').join('');
+    document.getElementById('hotspotTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:180px;"></div></div>';
+    try{ Hot.data = await api('/hotspots'); }catch(e){ Hot.data = []; }
+    let proj = {current:0,projection_6_months:0,projection_1_year:0,projection_2_years:0};
+    try{ proj = await api('/hotspots/projection'); }catch(e){}
+    Hot.renderProjection(proj);
+    Hot.render();
+  },
+  renderProjection(p){
+    document.getElementById('hotspotProjectionCards').innerHTML = `
+      <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-wifi"></i></div><div class="lbl">Current Hotspots</div><div class="val">${p.current}</div></div>
+      <div class="statcard glass"><div class="icn ic-bl"><i class="fa-solid fa-chart-line"></i></div><div class="lbl">Projected in 6 months</div><div class="val">${p.projection_6_months}</div></div>
+      <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-seedling"></i></div><div class="lbl">Projected in 1 year</div><div class="val">${p.projection_1_year}</div></div>
+      <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-crown"></i></div><div class="lbl">Projected in 2 years</div><div class="val">${p.projection_2_years}</div></div>
+    `;
+  },
+  render(){
+    const wrap = document.getElementById('hotspotTableWrap');
+    if(!Hot.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-wifi','No hotspots yet','Add an installation to start tracking ROI and payback period.','Add hotspot','emptyAddHot')}</tbody></table>`;
+      document.getElementById('emptyAddHot')?.addEventListener('click', Hot.openCreate);
+      return;
+    }
+    wrap.innerHTML = `<table class="datatable"><thead><tr>
+      <th>Location</th><th>Install cost</th><th>Monthly revenue</th><th>Monthly profit</th><th>ROI</th><th>Payback</th><th>Status</th><th></th>
+    </tr></thead><tbody>
+      ${Hot.data.map(h=>`<tr>
+        <td><b>${esc(h.location)}</b><div class="text-dim" style="font-size:11px;">Installed ${fmtDate(h.installation_date)}</div></td>
+        <td>${fmtMoney(h.installation_cost)}</td>
+        <td>${fmtMoney(h.monthly_revenue)}</td>
+        <td style="color:var(--emerald);font-family:var(--font-mono);">${fmtMoney(h.monthly_profit)}</td>
+        <td>${h.roi_percent.toFixed(1)}%</td>
+        <td>${h.payback_months ? h.payback_months.toFixed(1)+' mo' : '—'}</td>
+        <td><span class="pill ${h.status==='active'?'pill-em':'pill-gr'}">${esc(h.status)}</span></td>
+        <td><button class="iconsm danger" onclick="Hot.remove(${h.id})"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Add hotspot', `
+      <div class="formgrid">
+        <div class="field full"><label>Location</label><input type="text" id="f_loc" placeholder="e.g. Kasese Town Centre"></div>
+        <div class="field"><label>Installation cost</label><input type="number" id="f_cost" placeholder="0"></div>
+        <div class="field"><label>Installation date</label><input type="date" id="f_idate"></div>
+        <div class="field"><label>Monthly data cost</label><input type="number" id="f_data" placeholder="0"></div>
+        <div class="field"><label>Monthly electricity cost</label><input type="number" id="f_elec" placeholder="0"></div>
+        <div class="field"><label>Daily average revenue</label><input type="number" id="f_rev" placeholder="0"></div>
+        <div class="field full"><label>Link to business (optional)</label><select id="f_biz"><option value="">— None —</option>${bizOptions()}</select></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save hotspot</button></div>
+    `, ()=>{
+      document.getElementById('f_idate').valueAsDate = new Date();
+      document.getElementById('f_submit').onclick = async ()=>{
+        const loc = document.getElementById('f_loc').value.trim();
+        if(!loc) return toast('Location is required.', 'error');
+        await api('/hotspots', {method:'POST', body:{
+          location: loc, installation_cost: parseFloat(document.getElementById('f_cost').value)||0,
+          installation_date: document.getElementById('f_idate').value || null,
+          monthly_data_cost: parseFloat(document.getElementById('f_data').value)||0,
+          monthly_electricity_cost: parseFloat(document.getElementById('f_elec').value)||0,
+          daily_average_revenue: parseFloat(document.getElementById('f_rev').value)||0,
+          business_id: document.getElementById('f_biz').value || null,
+        }});
+        toast('Hotspot added.', 'success'); Modal.close(); Hot.load();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Remove this hotspot?')) return;
+    await api('/hotspots/'+id, {method:'DELETE'});
+    toast('Hotspot removed.', 'success'); Hot.load();
+  }
+};
+document.getElementById('addHotspotBtn').onclick = Hot.openCreate;
+
+/* ============================================================
+   INVESTMENTS
+   ============================================================ */
+const Inv = {
+  data: [],
+  async load(){
+    document.getElementById('invTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:160px;"></div></div>';
+    try{ Inv.data = await api('/investments'); }catch(e){ Inv.data = []; }
+    Inv.render();
+  },
+  render(){
+    const wrap = document.getElementById('invTableWrap');
+    if(!Inv.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-chart-line','No investments yet','Track the equipment and capital purchases growing your business.','Add investment','emptyAddInv')}</tbody></table>`;
+      document.getElementById('emptyAddInv')?.addEventListener('click', Inv.openCreate);
+      return;
+    }
+    const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '—';
+    wrap.innerHTML = `<table class="datatable"><thead><tr><th>Name</th><th>Business</th><th>Cost</th><th>Purchased</th><th>Notes</th><th></th></tr></thead><tbody>
+      ${Inv.data.map(i=>`<tr>
+        <td><b>${esc(i.name)}</b></td><td>${esc(bizName(i.business_id))}</td>
+        <td style="font-family:var(--font-mono);">${fmtMoney(i.cost)}</td><td>${fmtDate(i.purchase_date)}</td>
+        <td class="text-dim">${esc(i.notes)||'—'}</td>
+        <td><button class="iconsm danger" onclick="Inv.remove(${i.id})"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Add investment', `
+      <div class="formgrid">
+        <div class="field full"><label>Name</label><input type="text" id="f_name" placeholder="e.g. New Printer"></div>
+        <div class="field"><label>Cost</label><input type="number" id="f_cost" placeholder="0"></div>
+        <div class="field"><label>Purchase date</label><input type="date" id="f_date"></div>
+        <div class="field full"><label>Business (optional)</label><select id="f_biz"><option value="">— None —</option>${bizOptions()}</select></div>
+        <div class="field full"><label>Notes</label><input type="text" id="f_notes" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save investment</button></div>
+    `, ()=>{
+      document.getElementById('f_date').valueAsDate = new Date();
+      document.getElementById('f_submit').onclick = async ()=>{
+        const name = document.getElementById('f_name').value.trim();
+        const cost = parseFloat(document.getElementById('f_cost').value);
+        if(!name || !cost) return toast('Name and cost are required.', 'error');
+        await api('/investments', {method:'POST', body:{
+          name, cost, purchase_date: document.getElementById('f_date').value || null,
+          business_id: document.getElementById('f_biz').value || null,
+          notes: document.getElementById('f_notes').value.trim(),
+        }});
+        toast('Investment added.', 'success'); Modal.close(); Inv.load();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this investment?')) return;
+    await api('/investments/'+id, {method:'DELETE'});
+    toast('Investment deleted.', 'success'); Inv.load();
+  }
+};
+document.getElementById('addInvBtn').onclick = Inv.openCreate;
+
+/* ============================================================
+   ASSETS
+   ============================================================ */
+const Asset = {
+  data: [],
+  async load(){
+    document.getElementById('assetTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:160px;"></div></div>';
+    try{ Asset.data = await api('/assets'); }catch(e){ Asset.data = []; }
+    Asset.render();
+  },
+  render(){
+    const wrap = document.getElementById('assetTableWrap');
+    if(!Asset.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-vault','No assets yet','Add what you own — land, vehicles, equipment — to see your net worth.','Add asset','emptyAddAsset')}</tbody></table>`;
+      document.getElementById('emptyAddAsset')?.addEventListener('click', Asset.openCreate);
+      return;
+    }
+    wrap.innerHTML = `<table class="datatable"><thead><tr><th>Name</th><th>Purchase price</th><th>Current value</th><th>Change</th><th>Purchased</th><th></th></tr></thead><tbody>
+      ${Asset.data.map(a=>{
+        const change = a.purchase_price ? ((a.current_value-a.purchase_price)/a.purchase_price*100) : 0;
+        return `<tr>
+        <td><b>${esc(a.name)}</b>${a.notes?`<div class="text-dim" style="font-size:11px;">${esc(a.notes)}</div>`:''}</td>
+        <td>${fmtMoney(a.purchase_price)}</td>
+        <td style="font-family:var(--font-mono);">${fmtMoney(a.current_value)}</td>
+        <td><span class="pill ${change>=0?'pill-em':'pill-rd'}">${change>=0?'+':''}${change.toFixed(1)}%</span></td>
+        <td>${fmtDate(a.purchase_date)}</td>
+        <td><button class="iconsm danger" onclick="Asset.remove(${a.id})"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`;}).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Add asset', `
+      <div class="formgrid">
+        <div class="field full"><label>Name</label><input type="text" id="f_name" placeholder="e.g. Motorcycle"></div>
+        <div class="field"><label>Purchase price</label><input type="number" id="f_price" placeholder="0"></div>
+        <div class="field"><label>Current value</label><input type="number" id="f_value" placeholder="0"></div>
+        <div class="field"><label>Purchase date</label><input type="date" id="f_date"></div>
+        <div class="field full"><label>Notes</label><input type="text" id="f_notes" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save asset</button></div>
+    `, ()=>{
+      document.getElementById('f_date').valueAsDate = new Date();
+      document.getElementById('f_submit').onclick = async ()=>{
+        const name = document.getElementById('f_name').value.trim();
+        if(!name) return toast('Asset name is required.', 'error');
+        await api('/assets', {method:'POST', body:{
+          name, purchase_price: parseFloat(document.getElementById('f_price').value)||0,
+          current_value: parseFloat(document.getElementById('f_value').value)||0,
+          purchase_date: document.getElementById('f_date').value || null,
+          notes: document.getElementById('f_notes').value.trim(),
+        }});
+        toast('Asset added.', 'success'); Modal.close(); Asset.load();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this asset?')) return;
+    await api('/assets/'+id, {method:'DELETE'});
+    toast('Asset deleted.', 'success'); Asset.load();
+  }
+};
+document.getElementById('addAssetBtn').onclick = Asset.openCreate;
+
+/* ============================================================
+   GOALS
+   ============================================================ */
+const Goal = {
+  data: [],
+  async load(){
+    document.getElementById('goalsGrid').innerHTML = Array(3).fill('<div class="aicard glass"><div class="skel" style="height:90px;"></div></div>').join('');
+    try{ Goal.data = await api('/goals'); }catch(e){ Goal.data = []; }
+    Goal.render();
+  },
+  render(){
+    const grid = document.getElementById('goalsGrid');
+    if(!Goal.data.length){
+      grid.innerHTML = `<div class="glass" style="grid-column:1/-1;"><div class="emptystate"><i class="fa-solid fa-bullseye"></i><h4>No goals yet</h4><p>Set a target — rent, a car, a daily profit number — and track progress automatically.</p><button class="btn btn-primary btn-sm" id="emptyAddGoal"><i class="fa-solid fa-plus"></i> Add goal</button></div></div>`;
+      document.getElementById('emptyAddGoal').onclick = Goal.openCreate;
+      return;
+    }
+    grid.innerHTML = Goal.data.map(g=>`
+      <div class="aicard glass">
+        <div class="rowbetween mb-0" style="margin-bottom:10px;">
+          <b style="font-family:var(--font-display);font-size:14.5px;">${esc(g.name)}</b>
+          <span class="pill ${g.status==='completed'?'pill-em':g.status==='abandoned'?'pill-gr':'pill-gd'}">${esc(g.status)}</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${g.progress_percent}%;"></div></div>
+        <div class="rowbetween" style="margin:10px 0 0;font-size:12.5px;">
+          <span class="text-dim">${fmtMoney(g.current_amount)} of ${fmtMoney(g.target_amount)}</span>
+          <b>${g.progress_percent}%</b>
+        </div>
+        <div class="text-dim" style="font-size:11.5px;margin-top:4px;">${g.deadline? 'Deadline '+fmtDate(g.deadline) : 'No deadline set'} · ${fmtMoney(g.amount_remaining)} remaining</div>
+        <div class="rowactions" style="margin-top:14px;">
+          <button class="btn btn-ghost btn-sm" onclick="Goal.openUpdateProgress(${g.id})"><i class="fa-solid fa-arrow-up"></i> Update</button>
+          <button class="btn btn-ghost btn-sm" onclick="Goal.remove(${g.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+  },
+  openCreate(){
+    Modal.open('Add goal', `
+      <div class="formgrid">
+        <div class="field full"><label>Goal name</label><input type="text" id="f_name" placeholder="e.g. Buy a Car"></div>
+        <div class="field"><label>Target amount</label><input type="number" id="f_target" placeholder="0"></div>
+        <div class="field"><label>Current amount</label><input type="number" id="f_current" placeholder="0" value="0"></div>
+        <div class="field full"><label>Deadline (optional)</label><input type="date" id="f_deadline"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save goal</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        const name = document.getElementById('f_name').value.trim();
+        const target = parseFloat(document.getElementById('f_target').value);
+        if(!name || !target) return toast('Name and target amount are required.', 'error');
+        await api('/goals', {method:'POST', body:{
+          name, target_amount: target, current_amount: parseFloat(document.getElementById('f_current').value)||0,
+          deadline: document.getElementById('f_deadline').value || null,
+        }});
+        toast('Goal created.', 'success'); Modal.close(); Goal.load();
+      };
+    });
+  },
+  openUpdateProgress(id){
+    const g = Goal.data.find(x=>x.id===id); if(!g) return;
+    Modal.open('Update progress — ' + g.name, `
+      <div class="field"><label>Current amount saved toward this goal</label><input type="number" id="f_current" value="${g.current_amount}"></div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Update</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        await api('/goals/'+id, {method:'PUT', body:{ current_amount: parseFloat(document.getElementById('f_current').value)||0 }});
+        toast('Goal progress updated.', 'success'); Modal.close(); Goal.load(); Notif.poll();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this goal?')) return;
+    await api('/goals/'+id, {method:'DELETE'});
+    toast('Goal deleted.', 'success'); Goal.load();
+  }
+};
+document.getElementById('addGoalBtn').onclick = Goal.openCreate;
+
+/* ============================================================
+   AI ADVISOR
+   ============================================================ */
+const AI = {
+  async load(){
+    document.getElementById('aiInsightsGrid').innerHTML = Array(4).fill('<div class="aicard glass"><div class="skel" style="height:70px;"></div></div>').join('');
+    await AI.refresh();
+    AI.loadHistory();
+  },
+  async refresh(){
+    let data;
+    try{ data = await api('/ai/advice'); }catch(e){ return; }
+    const grid = document.getElementById('aiInsightsGrid');
+    if(!data.insights.length){ grid.innerHTML = '<div class="emptystate" style="grid-column:1/-1;"><i class="fa-solid fa-wand-magic-sparkles"></i><p>Add some transactions and I\'ll start generating insights.</p></div>'; return; }
+    grid.innerHTML = data.insights.map(txt=>`
+      <div class="aicard glass"><div class="aiTag"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Insight</span></div><p>${esc(txt)}</p></div>
+    `).join('');
+  },
+  async loadHistory(){
+    let hist;
+    try{ hist = await api('/ai/insights/history?limit=25'); }catch(e){ hist = []; }
+    const box = document.getElementById('aiHistoryList');
+    if(!hist.length){ box.innerHTML = '<p class="text-dim" style="font-size:13px;">No history yet.</p>'; return; }
+    box.innerHTML = hist.map(h=>`<div style="padding:10px 0;border-bottom:1px solid rgba(126,211,171,0.07);font-size:13.5px;">
+      <div>${esc(h.content)}</div><div class="text-dim" style="font-size:11px;margin-top:3px;">${fmtDateTime(h.created_at)}</div>
+    </div>`).join('');
+  }
+};
+document.getElementById('refreshAiBtn').onclick = async ()=>{
+  const btn = document.getElementById('refreshAiBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking…';
+  await AI.refresh(); await AI.loadHistory();
+  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh insights';
+  toast('Insights refreshed.', 'success');
+};
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+const Rep = {
+  data: null,
+  async load(){
+    document.getElementById('reportCards').innerHTML = Array(3).fill('<div class="statcard glass"><div class="skel" style="height:60px;"></div></div>').join('');
+    document.getElementById('reportTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:180px;"></div></div>';
+    const period = document.getElementById('reportPeriod').value;
+    try{ Rep.data = await api('/reports/summary?period='+period); }catch(e){ Rep.data = null; }
+    Rep.render();
+  },
+  render(){
+    if(!Rep.data) return;
+    const d = Rep.data;
+    document.getElementById('reportCards').innerHTML = `
+      <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="lbl">Total Revenue</div><div class="val">${fmtMoney(d.total_revenue)}</div></div>
+      <div class="statcard glass"><div class="icn ic-rd"><i class="fa-solid fa-arrow-trend-down"></i></div><div class="lbl">Total Expense</div><div class="val">${fmtMoney(d.total_expense)}</div></div>
+      <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-coins"></i></div><div class="lbl">Net Profit</div><div class="val">${fmtMoney(d.total_profit)}</div></div>
+    `;
+    const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '—';
+    const wrap = document.getElementById('reportTableWrap');
+    if(!d.transactions.length){ wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-file-lines','No activity in this period','Try a different period, or record some transactions.')}</tbody></table>`; return; }
+    wrap.innerHTML = `<table class="datatable"><thead><tr><th>Date</th><th>Business</th><th>Type</th><th>Category</th><th style="text-align:right;">Amount</th></tr></thead><tbody>
+      ${d.transactions.map(t=>`<tr><td>${fmtDate(t.date)}</td><td>${esc(bizName(t.business_id))}</td>
+        <td><span class="pill ${t.type==='revenue'?'pill-em':'pill-rd'}">${t.type}</span></td><td>${esc(t.category)}</td>
+        <td style="text-align:right;font-family:var(--font-mono);">${fmtMoney(t.amount)}</td></tr>`).join('')}
+    </tbody></table>`;
+  },
+  exportCsv(){
+    if(!Rep.data || !Rep.data.transactions.length) return toast('Nothing to export for this period.', 'error');
+    const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '';
+    const rows = [['Date','Business','Type','Category','Description','Amount']];
+    Rep.data.transactions.forEach(t=> rows.push([t.date, bizName(t.business_id), t.type, t.category, (t.description||'').replace(/,/g,';'), t.amount]));
+    const csv = rows.map(r=>r.join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `growth-tracker-report-${Rep.data.period}-${Rep.data.end_date}.csv`;
+    a.click();
+    toast('CSV exported.', 'success');
+  }
+};
+document.getElementById('reportPeriod').addEventListener('change', Rep.load);
+document.getElementById('exportCsvBtn').onclick = ()=>Rep.exportCsv();
+document.getElementById('printReportBtn').onclick = ()=>window.print();
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+const Settings = {
+  load(){
+    document.getElementById('setName').value = State.user.full_name;
+    document.getElementById('setCurrency').value = State.user.currency;
+    document.getElementById('setApiBase').value = State.apiBase;
+  }
+};
+document.getElementById('saveProfileBtn').onclick = async ()=>{
+  const body = { full_name: document.getElementById('setName').value.trim(), currency: document.getElementById('setCurrency').value };
+  const pw = document.getElementById('setPassword').value;
+  if(pw) body.password = pw;
+  const updated = await api('/me', {method:'PUT', body});
+  State.user = updated; Store.set('gt_user', JSON.stringify(updated));
+  document.getElementById('userNameChip').textContent = updated.full_name;
+  document.getElementById('userCurrencyChip').textContent = updated.currency + ' account';
+  document.getElementById('userAvatar').textContent = updated.full_name.trim().charAt(0).toUpperCase();
+  document.getElementById('setPassword').value = '';
+  toast('Profile updated.', 'success');
+};
+document.getElementById('saveApiBaseBtn').onclick = ()=>{
+  const val = document.getElementById('setApiBase').value.trim().replace(/\/$/,'');
+  if(!val) return toast('Enter a valid URL.', 'error');
+  State.apiBase = val; Store.set('gt_api_base', val);
+  toast('API connection saved. Reconnecting…', 'success');
+  App.goSection('dashboard');
+};
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+async function boot(){
+  if(State.token && State.user){
+    try{
+      const me = await api('/me');
+      State.user = me; Store.set('gt_user', JSON.stringify(me));
+      showApp();
+      return;
+    }catch(e){ /* token invalid, fall through to auth screen */ }
+  }
+  showAuthScreen();
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
