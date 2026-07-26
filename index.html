@@ -656,7 +656,7 @@ const Store = {
    CONFIG / STATE
    ============================================================ */
 const State = {
-  apiBase: Store.get('gt_api_base') || 'http://127.0.0.1:8000',
+  apiBase: Store.get('gt_api_base') || 'https://tracker-lw8d.onrender.com',
   token: Store.get('gt_token') || null,
   user: JSON.parse(Store.get('gt_user') || 'null'),
   businesses: [],
