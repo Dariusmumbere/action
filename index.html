@@ -535,6 +535,55 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
   #topbar{padding:12px 16px;}
   .missioncard{padding:22px 18px;}
 }
+
+/* ============================================================
+   TODOS
+   ============================================================ */
+.todo-toprow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px;}
+.todolist{display:flex;flex-direction:column;gap:10px;}
+.todo-item{padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.todo-check{
+  width:22px;height:22px;border-radius:7px;border:2px solid var(--panel-border-strong);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+  cursor:pointer;transition:all .15s var(--ease-snap);color:transparent;font-size:11px;background:transparent;
+}
+.todo-check:hover{border-color:var(--emerald);}
+.todo-item.completed .todo-check{background:linear-gradient(120deg,var(--emerald),var(--gold));border-color:transparent;color:#08130f;}
+.todo-item.completed .todo-title{text-decoration:line-through;color:var(--text-2);}
+.todo-body{flex:1;min-width:0;}
+.todo-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.todo-title{font-size:14px;font-weight:600;}
+.todo-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;font-size:11.5px;color:var(--text-2);}
+.todo-meta span{display:inline-flex;align-items:center;gap:5px;}
+.todo-notes{font-size:12.5px;color:var(--text-1);margin-top:6px;}
+.todo-ai{margin-top:8px;padding:8px 11px;border-radius:9px;background:rgba(238,192,101,0.08);border:1px solid rgba(238,192,101,0.18);font-size:12px;color:var(--text-0);display:flex;gap:7px;align-items:flex-start;}
+.todo-ai i{color:var(--gold);margin-top:2px;flex-shrink:0;}
+.pri-high{color:#ff9d97;}
+.pri-medium{color:var(--gold);}
+.pri-low{color:var(--text-2);}
+
+/* ============================================================
+   AI CHAT
+   ============================================================ */
+.chatpanel{padding:0;display:flex;flex-direction:column;height:520px;overflow:hidden;}
+.chatMessages{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
+.chatMsg{max-width:80%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;}
+.chatMsg.user{align-self:flex-end;background:linear-gradient(120deg,var(--emerald),#22c398);color:#06140f;border-bottom-right-radius:4px;}
+.chatMsg.assistant{align-self:flex-start;background:rgba(126,211,171,0.08);border:1px solid var(--panel-border);border-bottom-left-radius:4px;}
+.chatInputRow{border-top:1px solid var(--panel-border);padding:14px 16px;display:flex;gap:10px;align-items:flex-end;}
+.chatInputRow textarea{
+  flex:1;resize:none;max-height:100px;padding:11px 13px;border-radius:12px;
+  border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);
+  font-family:inherit;font-size:13.5px;outline:none;
+}
+.chatInputRow textarea:focus{border-color:var(--emerald-dim);box-shadow:0 0 0 3px var(--emerald-glow);}
+.chatSendBtn{width:42px;height:42px;border-radius:12px;border:none;background:linear-gradient(120deg,var(--emerald),var(--gold));color:#08130f;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.chatEmpty{text-align:center;color:var(--text-2);font-size:13px;margin:auto;padding:20px;}
+.typingDots{display:inline-flex;gap:4px;align-items:center;padding:4px 0;}
+.typingDots span{width:6px;height:6px;border-radius:50%;background:var(--text-2);animation:typingBounce 1.2s infinite ease-in-out;}
+.typingDots span:nth-child(2){animation-delay:.15s;}
+.typingDots span:nth-child(3){animation-delay:.3s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5;}30%{transform:translateY(-4px);opacity:1;}}
 </style>
 </head>
 <body>
@@ -634,6 +683,7 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
       </div>
       <div class="navlabel">Mission</div>
       <div class="navgroup">
+        <a class="navlink" data-section="todos"><i class="fa-solid fa-list-check"></i>Todo List</a>
         <a class="navlink" data-section="ai"><i class="fa-solid fa-wand-magic-sparkles"></i>AI Advisor</a>
         <a class="navlink" data-section="journal"><i class="fa-solid fa-book-open"></i>Daily Journal</a>
         <a class="navlink" data-section="timeline"><i class="fa-solid fa-road"></i>Timeline</a>
@@ -712,6 +762,11 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           </div>
         </div>
         <div class="chartpanel glass">
+          <div class="rowbetween"><h3><i class="fa-solid fa-list-check" style="color:var(--emerald);margin-right:8px;"></i>Today's Tasks</h3>
+            <button class="btn btn-ghost btn-sm" onclick="App.goSection('todos')">Open Todo List</button></div>
+          <ul class="priority-list" id="dashTodoList" style="font-size:13.5px;"><li class="text-dim">Loading…</li></ul>
+        </div>
+        <div class="chartpanel glass">
           <div class="rowbetween"><h3><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold);margin-right:8px;"></i>Today's AI Insight</h3>
             <button class="btn btn-ghost btn-sm" onclick="App.goSection('ai')">View all insights</button></div>
           <div id="dashInsight" class="text-dim" style="font-size:14px;">Loading insight…</div>
@@ -759,6 +814,10 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
             <div class="rowbetween mb-0"><h3>Savings Trend (90 days)</h3></div>
             <div class="chart-wrap"><canvas id="chartAnalyticsSavings"></canvas></div>
           </div>
+        </div>
+        <div class="chartpanel glass">
+          <div class="rowbetween mb-0"><h3>Daily Score History (30 days)</h3></div>
+          <div class="chart-wrap"><canvas id="chartScoreHistory"></canvas></div>
         </div>
       </section>
 
@@ -840,13 +899,61 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         <div class="aigrid" id="goalsGrid"></div>
       </section>
 
+      <!-- TODOS -->
+      <section class="section" id="section-todos">
+        <div class="rowbetween sectionHead">
+          <div><h2>Todo List</h2><p>Tasks drive your daily score — add them, complete them, get AI feedback.</p></div>
+          <div class="toolbar">
+            <select id="todoFilterStatus" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-size:13px;">
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <select id="todoFilterDate" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-size:13px;">
+              <option value="today" selected>Today</option>
+              <option value="all">All dates</option>
+            </select>
+            <button class="btn btn-primary" id="addTodoBtn"><i class="fa-solid fa-plus"></i> Add task</button>
+          </div>
+        </div>
+
+        <div class="todo-toprow">
+          <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-list-check"></i></div><div class="lbl">Tasks due today</div><div class="val" id="todoStatTotal">–</div></div>
+          <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-circle-check"></i></div><div class="lbl">Completed today</div><div class="val" id="todoStatDone">–</div></div>
+          <div class="statcard glass"><div class="icn ic-bl"><i class="fa-solid fa-bolt"></i></div><div class="lbl">Today's score</div><div class="val" id="todoStatScore">–</div></div>
+        </div>
+
+        <div class="chartpanel glass" style="margin-bottom:18px;">
+          <h3 style="margin-bottom:12px;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold);margin-right:8px;"></i>AI feedback on your task list</h3>
+          <ul class="priority-list" id="todoAiFeedback"><li class="text-dim">Loading…</li></ul>
+        </div>
+
+        <div class="todolist" id="todoList"></div>
+      </section>
+
       <!-- AI ADVISOR -->
       <section class="section" id="section-ai">
         <div class="rowbetween sectionHead">
-          <div><h2>AI Business Advisor</h2><p>Personalized insights based on your real numbers.</p></div>
+          <div><h2>AI Business Advisor</h2><p>Personalized insights based on your real numbers — and a chat that knows your whole system.</p></div>
           <button class="btn btn-gold" id="refreshAiBtn"><i class="fa-solid fa-arrows-rotate"></i> Refresh insights</button>
         </div>
         <div class="aigrid" id="aiInsightsGrid"></div>
+
+        <div class="chartpanel glass" style="margin-top:20px;">
+          <h3 style="margin-bottom:14px;"><i class="fa-solid fa-comments" style="color:var(--emerald);margin-right:8px;"></i>Chat with your AI Advisor</h3>
+          <p class="hint" style="margin-bottom:14px;">Aware of every business, goal, task, savings balance, and score in your account.</p>
+          <div class="chatpanel glass">
+            <div class="chatMessages" id="chatMessages">
+              <div class="chatEmpty" id="chatEmptyState">Ask about your businesses, goals, tasks, or what to focus on today.</div>
+            </div>
+            <div class="chatInputRow">
+              <textarea id="chatInput" rows="1" placeholder="Ask your AI Advisor anything about your business…"></textarea>
+              <button class="chatSendBtn" id="chatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+
         <div class="chartpanel glass" style="margin-top:20px;">
           <h3 style="margin-bottom:14px;"><i class="fa-solid fa-list-check" style="color:var(--emerald);margin-right:8px;"></i>Today's recommended routine</h3>
           <ul class="priority-list" id="aiRecList" style="font-size:13.5px;"></ul>
@@ -1204,7 +1311,8 @@ const SECTION_TITLES = {
   investments: ['Investments','Capital that compounds'],
   assets: ['Assets','What you own, and what it is worth'],
   goals: ['Financial Goals','Name it. Track it. Hit it.'],
-  ai: ['AI Advisor','Insights from your real numbers'],
+  todos: ['Todo List','Tasks that drive your daily score'],
+  ai: ['AI Advisor','Insights and chat from your real numbers'],
   journal: ['Daily Journal','What you did, learned, and will improve'],
   timeline: ['Timeline','Milestones on the way to your mission'],
   reports: ['Reports','Performance summaries, exportable anytime'],
@@ -1231,7 +1339,8 @@ const App = {
     else if(name==='investments') Inv.load();
     else if(name==='assets') Asset.load();
     else if(name==='goals') Goal.load();
-    else if(name==='ai') AI.load();
+    else if(name==='todos') Todo.load();
+    else if(name==='ai') { AI.load(); Chat.load(); }
     else if(name==='journal') Journal.load();
     else if(name==='timeline') Timeline.load();
     else if(name==='reports') Rep.load();
@@ -1434,6 +1543,18 @@ const Dash = {
       document.getElementById('dashRecList').innerHTML = '<li class="text-dim">Recommendations will appear once you have activity.</li>';
     }
 
+    try{
+      const todos = await api('/todos?due_date=' + new Date().toISOString().slice(0,10));
+      const list = document.getElementById('dashTodoList');
+      if(!todos.length){
+        list.innerHTML = '<li class="text-dim">No tasks scheduled for today — <a href="#" onclick="App.goSection(\'todos\');return false;" style="color:var(--emerald);">add some</a>.</li>';
+      }else{
+        list.innerHTML = todos.slice(0,6).map(t=>`<li><i class="fa-solid ${t.status==='completed'?'fa-circle-check':'fa-circle'}" style="${t.status==='completed'?'color:var(--emerald);':''}"></i>${esc(t.title)} <span class="pri-${t.priority}">(${t.priority})</span></li>`).join('');
+      }
+    }catch(e){
+      document.getElementById('dashTodoList').innerHTML = '<li class="text-dim">Could not load today\'s tasks.</li>';
+    }
+
     Mission.load();
     HotspotWidget.load();
     ExecScoreWidget.load();
@@ -1508,7 +1629,7 @@ const ExecScoreWidget = {
         <div class="ring" style="--p:${d.score};"><span>${Math.round(d.score)}%</span></div>
         <div class="ring-meta">
           <div class="rm-label">${d.score>=80?'Excellent day':d.score>=50?'Solid progress':'Room to improve'}</div>
-          Revenue ${d.breakdown.revenue_recorded?'✔':'✘'} · Expenses ${d.breakdown.expenses_recorded?'✔':'✘'} · Savings ${d.breakdown.savings_updated?'✔':'✘'} · Journal ${d.breakdown.journal_completed?'✔':'✘'}
+          Revenue ${d.breakdown.revenue_recorded?'✔':'✘'} · Expenses ${d.breakdown.expenses_recorded?'✔':'✘'} · Savings ${d.breakdown.savings_updated?'✔':'✘'} · Journal ${d.breakdown.journal_completed?'✔':'✘'} · Tasks ${d.breakdown.tasks_completed||'0/0'}
         </div>
       </div>
       <ul class="suggestlist">${(d.suggestions||[]).slice(0,3).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
@@ -2043,6 +2164,7 @@ const Goal = {
         </div>
         ${g.estimated_completion_date ? `<div class="goal-extra" style="margin-top:2px;"><span>Est. completion: <b>${fmtDate(g.estimated_completion_date)}</b></span></div>` : ''}
         <div class="rowactions" style="margin-top:14px;">
+          <button class="btn btn-ghost btn-sm" onclick="Goal.openEdit(${g.id})"><i class="fa-solid fa-pen"></i> Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="Goal.openUpdateProgress(${g.id})"><i class="fa-solid fa-arrow-up"></i> Update</button>
           <button class="btn btn-ghost btn-sm" onclick="Goal.remove(${g.id})"><i class="fa-solid fa-trash"></i></button>
         </div>
@@ -2070,6 +2192,39 @@ const Goal = {
       };
     });
   },
+  openEdit(id){
+    const g = Goal.data.find(x=>x.id===id); if(!g) return;
+    Modal.open('Edit goal — ' + g.name, `
+      <div class="formgrid">
+        <div class="field full"><label>Goal name</label><input type="text" id="f_name" value="${esc(g.name)}"></div>
+        <div class="field"><label>Target amount</label><input type="number" id="f_target" value="${g.target_amount}"></div>
+        <div class="field"><label>Current amount</label><input type="number" id="f_current" value="${g.current_amount}"></div>
+        <div class="field"><label>Deadline</label><input type="date" id="f_deadline" value="${g.deadline||''}"></div>
+        <div class="field"><label>Status</label><select id="f_status">
+          <option value="active" ${g.status==='active'?'selected':''}>Active</option>
+          <option value="completed" ${g.status==='completed'?'selected':''}>Completed</option>
+          <option value="abandoned" ${g.status==='abandoned'?'selected':''}>Abandoned</option>
+        </select></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        const name = document.getElementById('f_name').value.trim();
+        const target = parseFloat(document.getElementById('f_target').value);
+        if(!name) return toast('Goal name is required.', 'error');
+        if(!target || target<=0) return toast('Target amount must be greater than zero.', 'error');
+        try{
+          await api('/goals/'+id, {method:'PUT', body:{
+            name, target_amount: target,
+            current_amount: parseFloat(document.getElementById('f_current').value)||0,
+            deadline: document.getElementById('f_deadline').value || null,
+            status: document.getElementById('f_status').value,
+          }});
+          toast('Goal updated.', 'success'); Modal.close(); Goal.load(); Notif.poll();
+        }catch(e){ /* api() already shows an error toast */ }
+      };
+    });
+  },
   openUpdateProgress(id){
     const g = Goal.data.find(x=>x.id===id); if(!g) return;
     Modal.open('Update progress — ' + g.name, `
@@ -2077,18 +2232,176 @@ const Goal = {
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Update</button></div>
     `, ()=>{
       document.getElementById('f_submit').onclick = async ()=>{
-        await api('/goals/'+id, {method:'PUT', body:{ current_amount: parseFloat(document.getElementById('f_current').value)||0 }});
-        toast('Goal progress updated.', 'success'); Modal.close(); Goal.load(); Notif.poll();
+        try{
+          await api('/goals/'+id, {method:'PUT', body:{ current_amount: parseFloat(document.getElementById('f_current').value)||0 }});
+          toast('Goal progress updated.', 'success'); Modal.close(); Goal.load(); Notif.poll();
+        }catch(e){ /* api() already shows an error toast */ }
       };
     });
   },
   async remove(id){
     if(!confirm('Delete this goal?')) return;
-    await api('/goals/'+id, {method:'DELETE'});
-    toast('Goal deleted.', 'success'); Goal.load();
+    try{
+      await api('/goals/'+id, {method:'DELETE'});
+      toast('Goal deleted.', 'success'); Goal.load();
+    }catch(e){ /* api() already shows an error toast */ }
   }
 };
 document.getElementById('addGoalBtn').onclick = Goal.openCreate;
+
+/* ============================================================
+   TODOS
+   ============================================================ */
+const Todo = {
+  data: [],
+  async load(){
+    document.getElementById('todoList').innerHTML = '<div class="skel" style="height:200px;"></div>';
+    await Todo.fetch();
+    Todo.loadStats();
+    Todo.loadFeedback();
+  },
+  async fetch(){
+    const status = document.getElementById('todoFilterStatus').value;
+    const dateMode = document.getElementById('todoFilterDate').value;
+    let q = '/todos?limit=200';
+    if(status) q += '&status='+status;
+    if(dateMode === 'today') q += '&due_date=' + new Date().toISOString().slice(0,10);
+    try{ Todo.data = await api(q); }catch(e){ Todo.data = []; }
+    Todo.render();
+  },
+  render(){
+    const wrap = document.getElementById('todoList');
+    if(!Todo.data.length){
+      wrap.innerHTML = `<div class="glass"><div class="emptystate"><i class="fa-solid fa-list-check"></i><h4>No tasks yet</h4><p>Add today's tasks — completing them raises your daily execution score.</p><button class="btn btn-primary btn-sm" id="emptyAddTodo"><i class="fa-solid fa-plus"></i> Add task</button></div></div>`;
+      document.getElementById('emptyAddTodo').onclick = Todo.openCreate;
+      return;
+    }
+    const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '';
+    wrap.innerHTML = Todo.data.map(t=>`
+      <div class="todo-item glass ${t.status==='completed'?'completed':''}">
+        <button class="todo-check" onclick="Todo.toggleComplete(${t.id})"><i class="fa-solid fa-check"></i></button>
+        <div class="todo-body">
+          <div class="todo-title-row">
+            <span class="todo-title">${esc(t.title)}</span>
+            <span class="pill ${t.status==='completed'?'pill-em':t.status==='in_progress'?'pill-gd':'pill-gr'}">${t.status.replace('_',' ')}</span>
+          </div>
+          <div class="todo-meta">
+            <span class="pri-${t.priority}"><i class="fa-solid fa-flag"></i> ${t.priority}</span>
+            <span><i class="fa-solid fa-calendar"></i> ${fmtDate(t.due_date)}</span>
+            ${t.business_id ? `<span><i class="fa-solid fa-building"></i> ${esc(bizName(t.business_id))}</span>` : ''}
+          </div>
+          ${t.notes ? `<div class="todo-notes">${esc(t.notes)}</div>` : ''}
+          ${t.ai_feedback ? `<div class="todo-ai"><i class="fa-solid fa-wand-magic-sparkles"></i><span>${esc(t.ai_feedback)}</span></div>` : ''}
+        </div>
+        <div class="rowactions">
+          <button class="iconsm" onclick="Todo.openEdit(${t.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="iconsm danger" onclick="Todo.remove(${t.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `).join('');
+  },
+  async loadStats(){
+    try{
+      const s = await api('/execution-score/today');
+      const total = s.breakdown.tasks_completed ? s.breakdown.tasks_completed.split('/')[1] : '0';
+      const done = s.breakdown.tasks_completed ? s.breakdown.tasks_completed.split('/')[0] : '0';
+      document.getElementById('todoStatTotal').textContent = total;
+      document.getElementById('todoStatDone').textContent = done;
+      document.getElementById('todoStatScore').textContent = Math.round(s.score) + '%';
+    }catch(e){
+      document.getElementById('todoStatTotal').textContent = '–';
+      document.getElementById('todoStatDone').textContent = '–';
+      document.getElementById('todoStatScore').textContent = '–';
+    }
+  },
+  async loadFeedback(){
+    const box = document.getElementById('todoAiFeedback');
+    try{
+      const fb = await api('/ai/todo-feedback');
+      box.innerHTML = (fb.feedback||[]).map(f=>`<li><i class="fa-solid fa-circle"></i>${esc(f)}</li>`).join('') || '<li class="text-dim">No feedback yet.</li>';
+    }catch(e){
+      box.innerHTML = '<li class="text-dim">Could not load AI feedback.</li>';
+    }
+  },
+  openCreate(){
+    Modal.open('Add task', `
+      <div class="formgrid">
+        <div class="field full"><label>Task title</label><input type="text" id="f_title" placeholder="e.g. Call hotspot supplier"></div>
+        <div class="field"><label>Priority</label><select id="f_priority">
+          <option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option>
+        </select></div>
+        <div class="field"><label>Due date</label><input type="date" id="f_due"></div>
+        <div class="field full"><label>Business (optional)</label><select id="f_biz"><option value="">— None —</option>${bizOptions()}</select></div>
+        <div class="field full"><label>Notes</label><input type="text" id="f_notes" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save task</button></div>
+    `, ()=>{
+      document.getElementById('f_due').valueAsDate = new Date();
+      document.getElementById('f_submit').onclick = async ()=>{
+        const title = document.getElementById('f_title').value.trim();
+        if(!title) return toast('Task title is required.', 'error');
+        const btn = document.getElementById('f_submit');
+        btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting AI feedback…';
+        try{
+          await api('/todos', {method:'POST', body:{
+            title, priority: document.getElementById('f_priority').value,
+            due_date: document.getElementById('f_due').value || null,
+            business_id: document.getElementById('f_biz').value || null,
+            notes: document.getElementById('f_notes').value.trim(),
+          }});
+          toast('Task added.', 'success'); Modal.close(); Todo.load();
+        }catch(e){ btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Save task'; }
+      };
+    });
+  },
+  openEdit(id){
+    const t = Todo.data.find(x=>x.id===id); if(!t) return;
+    Modal.open('Edit task', `
+      <div class="formgrid">
+        <div class="field full"><label>Task title</label><input type="text" id="f_title" value="${esc(t.title)}"></div>
+        <div class="field"><label>Priority</label><select id="f_priority">
+          <option value="low" ${t.priority==='low'?'selected':''}>Low</option>
+          <option value="medium" ${t.priority==='medium'?'selected':''}>Medium</option>
+          <option value="high" ${t.priority==='high'?'selected':''}>High</option>
+        </select></div>
+        <div class="field"><label>Status</label><select id="f_status">
+          <option value="pending" ${t.status==='pending'?'selected':''}>Pending</option>
+          <option value="in_progress" ${t.status==='in_progress'?'selected':''}>In progress</option>
+          <option value="completed" ${t.status==='completed'?'selected':''}>Completed</option>
+          <option value="abandoned" ${t.status==='abandoned'?'selected':''}>Abandoned</option>
+        </select></div>
+        <div class="field"><label>Due date</label><input type="date" id="f_due" value="${t.due_date||''}"></div>
+        <div class="field full"><label>Notes</label><input type="text" id="f_notes" value="${esc(t.notes)}"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        await api('/todos/'+id, {method:'PUT', body:{
+          title: document.getElementById('f_title').value.trim(),
+          priority: document.getElementById('f_priority').value,
+          status: document.getElementById('f_status').value,
+          due_date: document.getElementById('f_due').value || null,
+          notes: document.getElementById('f_notes').value.trim(),
+        }});
+        toast('Task updated.', 'success'); Modal.close(); Todo.load();
+      };
+    });
+  },
+  async toggleComplete(id){
+    const t = Todo.data.find(x=>x.id===id); if(!t) return;
+    const newStatus = t.status==='completed' ? 'pending' : 'completed';
+    await api('/todos/'+id, {method:'PUT', body:{status:newStatus}});
+    Todo.load();
+  },
+  async remove(id){
+    if(!confirm('Delete this task?')) return;
+    await api('/todos/'+id, {method:'DELETE'});
+    toast('Task deleted.', 'success'); Todo.load();
+  }
+};
+document.getElementById('addTodoBtn').onclick = Todo.openCreate;
+document.getElementById('todoFilterStatus').addEventListener('change', Todo.fetch);
+document.getElementById('todoFilterDate').addEventListener('change', Todo.fetch);
 
 /* ============================================================
    AI ADVISOR
@@ -2133,6 +2446,69 @@ document.getElementById('refreshAiBtn').onclick = async ()=>{
   btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh insights';
   toast('Insights refreshed.', 'success');
 };
+
+/* ============================================================
+   AI CHAT — full-system-aware conversational advisor
+   ============================================================ */
+const Chat = {
+  loaded: false,
+  async load(){
+    if(Chat.loaded) return;
+    Chat.loaded = true;
+    const box = document.getElementById('chatMessages');
+    try{
+      const hist = await api('/ai/chat/history?limit=60');
+      if(hist && hist.length){
+        document.getElementById('chatEmptyState')?.remove();
+        hist.forEach(m=>Chat.appendMessage(m.role, m.content, false));
+        box.scrollTop = box.scrollHeight;
+      }
+    }catch(e){}
+  },
+  appendMessage(role, content, scroll){
+    const box = document.getElementById('chatMessages');
+    const empty = document.getElementById('chatEmptyState');
+    if(empty) empty.remove();
+    const el = document.createElement('div');
+    el.className = 'chatMsg ' + (role==='user' ? 'user' : 'assistant');
+    el.textContent = content;
+    box.appendChild(el);
+    if(scroll !== false) box.scrollTop = box.scrollHeight;
+    return el;
+  },
+  async send(){
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if(!message) return;
+    input.value = '';
+    input.style.height = 'auto';
+    Chat.appendMessage('user', message);
+
+    const box = document.getElementById('chatMessages');
+    const typingEl = document.createElement('div');
+    typingEl.className = 'chatMsg assistant';
+    typingEl.innerHTML = '<div class="typingDots"><span></span><span></span><span></span></div>';
+    box.appendChild(typingEl);
+    box.scrollTop = box.scrollHeight;
+
+    try{
+      const res = await api('/ai/chat', {method:'POST', body:{message}});
+      typingEl.remove();
+      Chat.appendMessage('assistant', res.reply);
+    }catch(e){
+      typingEl.remove();
+      Chat.appendMessage('assistant', "Sorry, I couldn't reach the AI Advisor just now. Please try again.");
+    }
+  }
+};
+document.getElementById('chatSendBtn').onclick = ()=>Chat.send();
+document.getElementById('chatInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); Chat.send(); }
+});
+document.getElementById('chatInput').addEventListener('input', function(){
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
 
 /* ============================================================
    DAILY JOURNAL
@@ -2305,7 +2681,7 @@ const Empire = {
 };
 
 /* ============================================================
-   ANALYTICS (trends + forecast)
+   ANALYTICS (trends + forecast + score history)
    ============================================================ */
 const Analytics = {
   async load(){
@@ -2336,6 +2712,12 @@ const Analytics = {
       const trendWord = f.monthly_trend>0 ? 'trending up' : f.monthly_trend<0 ? 'trending down' : 'roughly flat';
       document.getElementById('forecastHint').textContent = `Based on the last ${f.history.length} months, monthly profit is ${trendWord} by about ${fmtMoney(Math.abs(f.monthly_trend))} per month. This is a directional estimate, not a guarantee.`;
     }
+
+    let scoreHist;
+    try{ scoreHist = await api('/execution-score/history?days=30'); }catch(e){ scoreHist = []; }
+    lineChart('chartScoreHistory','scoreHist', scoreHist.map(s=>fmtDate(s.date)), [
+      {label:'Daily execution score', data:scoreHist.map(s=>s.score), borderColor:'#eec065', backgroundColor:'rgba(238,192,101,0.12)', fill:true, tension:.3, pointRadius:2, borderWidth:2},
+    ]);
   }
 };
 
@@ -2396,6 +2778,7 @@ const Rep = {
       <div class="review-mini glass"><span>Savings This Week</span><b>${fmtMoney(w.savings_this_week)}</b></div>
       <div class="review-mini glass"><span>Investments This Week</span><b>${fmtMoney(w.investments_this_week)}</b></div>
       <div class="review-mini glass"><span>Avg Execution Score</span><b>${w.avg_execution_score!=null ? w.avg_execution_score+'%' : '—'}</b></div>
+      <div class="review-mini glass"><span>Tasks Completed</span><b>${w.week_tasks_done ?? 0}/${w.week_tasks_total ?? 0}</b></div>
     `;
     const lessons = document.getElementById('weeklyLessons');
     lessons.innerHTML = (w.lessons_learned && w.lessons_learned.length)
@@ -2416,6 +2799,7 @@ const Rep = {
       <div class="review-mini glass"><span>Savings Growth</span><b>${fmtMoney(m.savings_growth)}</b></div>
       <div class="review-mini glass"><span>Asset Value</span><b>${fmtMoney(m.asset_value)}</b></div>
       <div class="review-mini glass"><span>Investment Growth</span><b>${fmtMoney(m.investment_growth)}</b></div>
+      <div class="review-mini glass"><span>Tasks Completed</span><b>${m.month_tasks_done ?? 0}/${m.month_tasks_total ?? 0}</b></div>
     `;
     const wrap = document.getElementById('monthlyCompareWrap');
     const comp = m.business_comparison || [];
