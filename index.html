@@ -430,10 +430,110 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 .text-dim{color:var(--text-2);}
 .mb-0{margin-bottom:0 !important;}
 
+/* ============================================================
+   BUSINESS OPERATING SYSTEM ADDITIONS
+   ============================================================ */
+
+/* Mission Control card */
+.missioncard{padding:28px 30px;margin-bottom:20px;position:relative;overflow:hidden;}
+.missioncard::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(640px 320px at 92% -30%, rgba(238,192,101,0.14), transparent 60%),
+             radial-gradient(500px 260px at -10% 120%, rgba(62,224,168,0.10), transparent 60%);
+}
+.mc-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:8px;position:relative;z-index:1;}
+.mc-eyebrow i{font-size:11px;}
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;position:relative;z-index:1;}
+.missioncard h2{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.01em;margin-bottom:4px;}
+.mc-dates{color:var(--text-2);font-size:13px;}
+.mc-dates b{color:var(--text-1);font-weight:600;}
+.mc-phase-pill{padding:6px 15px;border-radius:20px;font-size:12px;font-weight:700;background:linear-gradient(120deg,var(--emerald),var(--gold));color:#08130f;white-space:nowrap;box-shadow:0 8px 20px -10px var(--emerald-glow);}
+.mc-progress-row{display:flex;align-items:center;gap:14px;margin-top:22px;position:relative;z-index:1;}
+.mc-progress-row .progress-track{flex:1;height:11px;}
+.mc-progress-row .mc-pct{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--emerald);min-width:48px;text-align:right;}
+.mc-stats{display:flex;gap:30px;margin-top:14px;font-size:12.5px;color:var(--text-2);position:relative;z-index:1;flex-wrap:wrap;}
+.mc-stats b{color:var(--text-0);font-family:var(--font-mono);font-size:13px;}
+
+/* Widget row (hotspot / execution score / motivation) */
+.dashRow3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+@media (max-width:980px){.dashRow3{grid-template-columns:1fr;}}
+.widgetcard{padding:20px 21px;display:flex;flex-direction:column;}
+.widgetcard h4{font-family:var(--font-display);font-size:13.5px;font-weight:600;margin-bottom:15px;display:flex;align-items:center;gap:8px;color:var(--text-0);}
+.widgetcard h4 i{color:var(--gold);font-size:12px;}
+
+.ringwrap{display:flex;align-items:center;gap:16px;}
+.ring{width:82px;height:82px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;background:conic-gradient(var(--emerald) calc(var(--p,0)*1%), rgba(126,211,171,0.1) 0);}
+.ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--panel-solid);}
+.ring span{position:relative;z-index:1;font-family:var(--font-display);font-size:19px;font-weight:700;}
+.ring-meta{font-size:12px;color:var(--text-2);flex:1;}
+.ring-meta .rm-label{color:var(--text-1);font-weight:600;font-size:12.5px;margin-bottom:2px;}
+
+.suggestlist{list-style:none;margin-top:12px;font-size:12px;color:var(--text-1);}
+.suggestlist li{padding:4px 0;padding-left:16px;position:relative;line-height:1.4;}
+.suggestlist li::before{content:"\2192";position:absolute;left:0;color:var(--emerald);}
+
+.hs-mini-row{display:flex;justify-content:space-between;margin-top:2px;margin-bottom:10px;}
+.hs-mini{text-align:center;flex:1;}
+.hs-mini b{display:block;font-family:var(--font-display);font-size:20px;}
+.hs-mini span{font-size:10.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;}
+
+.motivation-quote{font-family:var(--font-display);font-style:italic;font-size:13.5px;color:var(--text-0);line-height:1.55;margin-bottom:12px;position:relative;padding-left:14px;border-left:2px solid var(--gold);}
+.priority-list{list-style:none;font-size:12.5px;color:var(--text-1);}
+.priority-list li{padding:5px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.4;}
+.priority-list li i{color:var(--gold);margin-top:3px;font-size:8px;flex-shrink:0;}
+
+/* Goal cards extra meta */
+.goal-extra{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-2);gap:8px;flex-wrap:wrap;}
+.goal-extra b{color:var(--text-1);}
+
+/* Journal */
+.journalgrid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;}
+@media (max-width:900px){.journalgrid{grid-template-columns:1fr;}}
+.journal-entry{padding:16px 18px;margin-bottom:12px;}
+.journal-entry .je-date{font-family:var(--font-display);font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--emerald);}
+.journal-entry .je-row{margin-bottom:8px;font-size:13px;line-height:1.5;}
+.journal-entry .je-row b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-2);margin-bottom:2px;font-weight:600;}
+.journal-entry .je-row span{color:var(--text-0);}
+
+/* Timeline */
+.timeline-wrap{position:relative;padding:6px 0 6px 28px;}
+.timeline-wrap::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--emerald),var(--gold));border-radius:2px;}
+.tl-year{font-family:var(--font-display);font-size:17px;font-weight:700;margin:24px 0 12px;color:var(--gold);letter-spacing:-0.01em;}
+.tl-year:first-child{margin-top:0;}
+.tl-item{position:relative;margin-bottom:12px;padding:13px 16px;}
+.tl-item::before{content:"";position:absolute;left:-27px;top:18px;width:11px;height:11px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 4px rgba(62,224,168,0.16);}
+.tl-item .tl-date{font-size:11px;color:var(--text-2);margin-bottom:3px;}
+.tl-item .tl-title{font-weight:600;font-size:14px;}
+.tl-item .tl-notes{font-size:12.5px;color:var(--text-1);margin-top:4px;}
+
+/* Business Empire */
+.empire-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.empire-card{padding:20px 21px;}
+.empire-card .ec-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.empire-card .ec-name{font-family:var(--font-display);font-size:15.5px;font-weight:700;}
+.empire-card .ec-cat{font-size:11.5px;color:var(--text-2);margin-top:2px;}
+.empire-card .ec-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:8px;}
+.empire-card .ec-metric span{display:block;font-size:10.5px;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;}
+.empire-card .ec-metric b{font-family:var(--font-mono);font-size:14px;}
+
+/* Review panels */
+.review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;}
+.review-mini{padding:15px 16px;}
+.review-mini span{display:block;font-size:11px;color:var(--text-2);margin-bottom:4px;}
+.review-mini b{font-family:var(--font-display);font-size:17px;}
+.lesson-item{padding:9px 0;border-bottom:1px solid rgba(126,211,171,0.07);font-size:13px;color:var(--text-1);}
+.lesson-item:last-child{border-bottom:none;}
+
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab-btn{padding:8px 15px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(126,211,171,0.04);color:var(--text-1);font-size:12.5px;font-weight:600;transition:all .15s;}
+.tab-btn.active{background:linear-gradient(120deg,var(--emerald),var(--gold));color:#08130f;border-color:transparent;}
+.tab-btn:hover:not(.active){border-color:var(--panel-border-strong);color:var(--text-0);}
+
 @media (max-width:560px){
   .formgrid{grid-template-columns:1fr;}
   #content{padding:16px;}
   #topbar{padding:12px 16px;}
+  .missioncard{padding:22px 18px;}
 }
 </style>
 </head>
@@ -516,8 +616,14 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
     <nav>
       <div class="navgroup">
         <a class="navlink active" data-section="dashboard"><i class="fa-solid fa-gauge-high"></i>Dashboard</a>
+        <a class="navlink" data-section="empire"><i class="fa-solid fa-crown"></i>Business Empire</a>
+        <a class="navlink" data-section="analytics"><i class="fa-solid fa-chart-area"></i>Analytics</a>
+      </div>
+      <div class="navlabel">Operations</div>
+      <div class="navgroup">
         <a class="navlink" data-section="businesses"><i class="fa-solid fa-building"></i>Businesses</a>
         <a class="navlink" data-section="transactions"><i class="fa-solid fa-right-left"></i>Transactions</a>
+        <a class="navlink" data-section="hotspots"><i class="fa-solid fa-wifi"></i>Hotspots</a>
       </div>
       <div class="navlabel">Wealth</div>
       <div class="navgroup">
@@ -526,10 +632,11 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         <a class="navlink" data-section="assets"><i class="fa-solid fa-vault"></i>Assets</a>
         <a class="navlink" data-section="goals"><i class="fa-solid fa-bullseye"></i>Goals</a>
       </div>
-      <div class="navlabel">Operations</div>
+      <div class="navlabel">Mission</div>
       <div class="navgroup">
-        <a class="navlink" data-section="hotspots"><i class="fa-solid fa-wifi"></i>Hotspots</a>
         <a class="navlink" data-section="ai"><i class="fa-solid fa-wand-magic-sparkles"></i>AI Advisor</a>
+        <a class="navlink" data-section="journal"><i class="fa-solid fa-book-open"></i>Daily Journal</a>
+        <a class="navlink" data-section="timeline"><i class="fa-solid fa-road"></i>Timeline</a>
         <a class="navlink" data-section="reports"><i class="fa-solid fa-file-lines"></i>Reports</a>
       </div>
       <div class="navlabel">Account</div>
@@ -563,6 +670,26 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 
       <!-- DASHBOARD -->
       <section class="section active" id="section-dashboard">
+
+        <div class="glass missioncard" id="missionCard">
+          <div class="skel" style="height:90px;"></div>
+        </div>
+
+        <div class="dashRow3">
+          <div class="glass widgetcard" id="hotspotWidget">
+            <h4><i class="fa-solid fa-wifi"></i>Hotspot Progress</h4>
+            <div class="skel" style="height:70px;"></div>
+          </div>
+          <div class="glass widgetcard" id="execScoreWidget">
+            <h4><i class="fa-solid fa-bolt"></i>Today's Execution Score</h4>
+            <div class="skel" style="height:70px;"></div>
+          </div>
+          <div class="glass widgetcard" id="motivationWidget">
+            <h4><i class="fa-solid fa-fire"></i>Today's Focus</h4>
+            <div class="skel" style="height:70px;"></div>
+          </div>
+        </div>
+
         <div class="cardgrid" id="dashCards"></div>
         <div class="chartrow">
           <div class="chartpanel glass">
@@ -588,6 +715,50 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           <div class="rowbetween"><h3><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold);margin-right:8px;"></i>Today's AI Insight</h3>
             <button class="btn btn-ghost btn-sm" onclick="App.goSection('ai')">View all insights</button></div>
           <div id="dashInsight" class="text-dim" style="font-size:14px;">Loading insight…</div>
+        </div>
+        <div class="chartpanel glass">
+          <div class="rowbetween"><h3><i class="fa-solid fa-list-check" style="color:var(--emerald);margin-right:8px;"></i>Recommended actions for today</h3></div>
+          <ul class="priority-list" id="dashRecList" style="font-size:13.5px;"><li class="text-dim">Loading…</li></ul>
+        </div>
+      </section>
+
+      <!-- BUSINESS EMPIRE -->
+      <section class="section" id="section-empire">
+        <div class="rowbetween sectionHead">
+          <div><h2>Business Empire</h2><p>Every income source, side by side.</p></div>
+        </div>
+        <div class="empire-grid" id="empireGrid"></div>
+        <div class="chartrow" style="margin-top:20px;">
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Income Distribution (90 days)</h3></div>
+            <div class="chart-wrap"><canvas id="chartIncomePie"></canvas></div>
+          </div>
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Revenue Contribution</h3></div>
+            <div class="chart-wrap"><canvas id="chartIncomeBar"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="section" id="section-analytics">
+        <div class="rowbetween sectionHead">
+          <div><h2>Analytics</h2><p>Trends, comparisons, and a 12-month forecast.</p></div>
+        </div>
+        <div class="chartpanel glass">
+          <div class="rowbetween mb-0"><h3>Monthly Profit — history &amp; 12-month forecast</h3></div>
+          <div class="chart-wrap" style="height:280px;"><canvas id="chartForecast"></canvas></div>
+          <p class="hint" id="forecastHint" style="margin-top:10px;"></p>
+        </div>
+        <div class="chartrow">
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Revenue vs Expenses (90 days)</h3></div>
+            <div class="chart-wrap"><canvas id="chartAnalyticsRevenue"></canvas></div>
+          </div>
+          <div class="chartpanel glass">
+            <div class="rowbetween mb-0"><h3>Savings Trend (90 days)</h3></div>
+            <div class="chart-wrap"><canvas id="chartAnalyticsSavings"></canvas></div>
+          </div>
         </div>
       </section>
 
@@ -677,8 +848,46 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         </div>
         <div class="aigrid" id="aiInsightsGrid"></div>
         <div class="chartpanel glass" style="margin-top:20px;">
+          <h3 style="margin-bottom:14px;"><i class="fa-solid fa-list-check" style="color:var(--emerald);margin-right:8px;"></i>Today's recommended routine</h3>
+          <ul class="priority-list" id="aiRecList" style="font-size:13.5px;"></ul>
+        </div>
+        <div class="chartpanel glass" style="margin-top:20px;">
           <h3 style="margin-bottom:14px;">Insight history</h3>
           <div id="aiHistoryList"></div>
+        </div>
+      </section>
+
+      <!-- DAILY JOURNAL -->
+      <section class="section" id="section-journal">
+        <div class="rowbetween sectionHead">
+          <div><h2>Daily Journal</h2><p>What you did, what you learned, what's next.</p></div>
+        </div>
+        <div class="journalgrid">
+          <div class="glass" style="padding:22px;">
+            <h3 style="font-family:var(--font-display);font-size:15px;margin-bottom:14px;">Today's entry</h3>
+            <div class="field"><label>What did I accomplish today?</label><textarea id="jAccomplished" rows="2" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-family:inherit;font-size:13.5px;resize:vertical;"></textarea></div>
+            <div class="field"><label>What challenges did I face?</label><textarea id="jChallenges" rows="2" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-family:inherit;font-size:13.5px;resize:vertical;"></textarea></div>
+            <div class="field"><label>What did I learn?</label><textarea id="jLearned" rows="2" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-family:inherit;font-size:13.5px;resize:vertical;"></textarea></div>
+            <div class="field"><label>What will I improve tomorrow?</label><textarea id="jImprove" rows="2" style="width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-family:inherit;font-size:13.5px;resize:vertical;"></textarea></div>
+            <button class="btn btn-primary btn-block" id="saveJournalBtn"><i class="fa-solid fa-check"></i> Save today's entry</button>
+          </div>
+          <div>
+            <div class="toolbar" style="margin-bottom:14px;">
+              <div class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="journalSearch" placeholder="Search past entries…"></div>
+            </div>
+            <div id="journalList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIMELINE -->
+      <section class="section" id="section-timeline">
+        <div class="rowbetween sectionHead">
+          <div><h2>Timeline</h2><p>The milestones on the way to your mission.</p></div>
+          <button class="btn btn-primary" id="addMilestoneBtn"><i class="fa-solid fa-plus"></i> Add milestone</button>
+        </div>
+        <div class="glass" style="padding:22px 26px;">
+          <div class="timeline-wrap" id="timelineWrap"></div>
         </div>
       </section>
 
@@ -695,13 +904,35 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
             <button class="btn btn-ghost" id="printReportBtn"><i class="fa-solid fa-print"></i> Print / PDF</button>
           </div>
         </div>
-        <div class="cardgrid" id="reportCards"></div>
-        <div class="glass tblwrap" id="reportTableWrap"></div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="summary">Summary</button>
+          <button class="tab-btn" data-tab="weekly">Weekly Review</button>
+          <button class="tab-btn" data-tab="monthly">Monthly Review</button>
+        </div>
+
+        <div id="reportTab-summary">
+          <div class="cardgrid" id="reportCards"></div>
+          <div class="glass tblwrap" id="reportTableWrap"></div>
+        </div>
+
+        <div id="reportTab-weekly" class="hidden">
+          <div class="review-grid" id="weeklyReviewGrid"></div>
+          <div class="chartpanel glass">
+            <h3 style="margin-bottom:10px;">Lessons learned this week</h3>
+            <div id="weeklyLessons"></div>
+          </div>
+        </div>
+
+        <div id="reportTab-monthly" class="hidden">
+          <div class="review-grid" id="monthlyReviewGrid"></div>
+          <div class="glass tblwrap" id="monthlyCompareWrap"></div>
+        </div>
       </section>
 
       <!-- SETTINGS -->
       <section class="section" id="section-settings">
-        <div class="sectionHead" style="margin-bottom:20px;"><h2>Settings</h2><p>Your profile and connection preferences.</p></div>
+        <div class="sectionHead" style="margin-bottom:20px;"><h2>Settings</h2><p>Your profile, mission, and connection preferences.</p></div>
         <div class="glass" style="padding:24px;max-width:480px;margin-bottom:18px;">
           <h3 style="font-family:var(--font-display);margin-bottom:16px;font-size:15.5px;">Profile</h3>
           <div class="field"><label>Full name</label><input type="text" id="setName"></div>
@@ -713,6 +944,17 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           </div>
           <div class="field"><label>New password <span class="text-dim">(leave blank to keep current)</span></label><input type="password" id="setPassword" placeholder="••••••••"></div>
           <button class="btn btn-primary" id="saveProfileBtn"><i class="fa-solid fa-check"></i> Save changes</button>
+        </div>
+        <div class="glass" style="padding:24px;max-width:480px;margin-bottom:18px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:6px;font-size:15.5px;">Mission</h3>
+          <p class="hint" style="margin-bottom:14px;">This powers the Mission Control card on your dashboard.</p>
+          <div class="field"><label>Mission title</label><input type="text" id="setMissionTitle" placeholder="My 2-Year Financial Freedom Mission"></div>
+          <div class="formgrid">
+            <div class="field"><label>Start date</label><input type="date" id="setMissionStart"></div>
+            <div class="field"><label>End date</label><input type="date" id="setMissionEnd"></div>
+          </div>
+          <div class="field"><label>Target hotspot count</label><input type="number" id="setTargetHotspots" min="1"></div>
+          <button class="btn btn-primary" id="saveMissionBtn"><i class="fa-solid fa-check"></i> Save mission</button>
         </div>
         <div class="glass" style="padding:24px;max-width:480px;">
           <h3 style="font-family:var(--font-display);margin-bottom:6px;font-size:15.5px;">API connection</h3>
@@ -772,7 +1014,6 @@ const Theme = {
   apply(mode){
     document.documentElement.setAttribute('data-theme', mode);
     Store.set(this.key, mode);
-    // Chart.js text colors need to be refreshed for the new theme
     if(typeof Chart !== 'undefined'){
       const dim = mode==='light' ? '#7c8c81' : '#7c9089';
       const grid = mode==='light' ? 'rgba(31,74,58,0.09)' : 'rgba(126,211,171,0.09)';
@@ -851,6 +1092,10 @@ async function api(path, opts){
     throw new Error(msg);
   }
   return data;
+}
+/* Silent variant — used for background polling where we don't want error toasts */
+async function apiSilent(path, opts){
+  try{ return await api(path, opts); }catch(e){ return null; }
 }
 
 /* ============================================================
@@ -950,6 +1195,8 @@ document.getElementById('logoutBtn').onclick = ()=>logout(false);
    ============================================================ */
 const SECTION_TITLES = {
   dashboard: ['Dashboard','Your business empire, at a glance'],
+  empire: ['Business Empire','Every income source, side by side'],
+  analytics: ['Analytics','Trends, comparisons and a 12-month forecast'],
   businesses: ['Businesses','Manage every venture you run'],
   transactions: ['Transactions','Daily revenue and expenses'],
   savings: ['Smart Savings','Build your safety net automatically'],
@@ -958,8 +1205,10 @@ const SECTION_TITLES = {
   assets: ['Assets','What you own, and what it is worth'],
   goals: ['Financial Goals','Name it. Track it. Hit it.'],
   ai: ['AI Advisor','Insights from your real numbers'],
+  journal: ['Daily Journal','What you did, learned, and will improve'],
+  timeline: ['Timeline','Milestones on the way to your mission'],
   reports: ['Reports','Performance summaries, exportable anytime'],
-  settings: ['Settings','Profile & connection preferences'],
+  settings: ['Settings','Profile, mission & connection preferences'],
 };
 
 const App = {
@@ -973,6 +1222,8 @@ const App = {
   },
   loadSection(name){
     if(name==='dashboard') Dash.load();
+    else if(name==='empire') Empire.load();
+    else if(name==='analytics') Analytics.load();
     else if(name==='businesses') Biz.load();
     else if(name==='transactions') Tx.load();
     else if(name==='savings') Sav.load();
@@ -981,12 +1232,15 @@ const App = {
     else if(name==='assets') Asset.load();
     else if(name==='goals') Goal.load();
     else if(name==='ai') AI.load();
+    else if(name==='journal') Journal.load();
+    else if(name==='timeline') Timeline.load();
     else if(name==='reports') Rep.load();
     else if(name==='settings') Settings.load();
   },
   async loadAllInitialData(){
     try{ State.businesses = await api('/businesses'); }catch(e){ State.businesses = []; }
     Notif.poll();
+    apiSilent('/notifications/check').then(()=>Notif.poll());
   }
 };
 document.querySelectorAll('.navlink[data-section]').forEach(a=>{
@@ -1042,6 +1296,8 @@ document.addEventListener('click', e=>{
   const drop = document.getElementById('notifDrop');
   if(drop.classList.contains('open') && !drop.contains(e.target) && e.target.id!=='notifBtn' && !e.target.closest('#notifBtn')) drop.classList.remove('open');
 });
+/* Re-run the smart notification rules periodically while the app is open */
+setInterval(()=>{ if(State.token) apiSilent('/notifications/check').then(()=>Notif.poll()); }, 5*60*1000);
 
 /* ============================================================
    CHART HELPERS
@@ -1076,6 +1332,7 @@ function lineChart(canvasId, key, labels, datasets){
   });
 }
 function barChart(canvasId, key, labels, data, colors){
+  if(!chartsAvailable) return;
   destroyChart(key);
   const ctx = document.getElementById(canvasId).getContext('2d');
   State.charts[key] = new Chart(ctx, {
@@ -1091,6 +1348,20 @@ function barChart(canvasId, key, labels, data, colors){
     }
   });
 }
+function pieChart(canvasId, key, labels, data, colors){
+  if(!chartsAvailable) return;
+  destroyChart(key);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  State.charts[key] = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{ data, backgroundColor: colors, borderWidth:2, borderColor: getComputedStyle(document.documentElement).getPropertyValue('--panel-solid') || '#132420' }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, padding:12, font:{size:11} } } }
+    }
+  });
+}
+const PALETTE = ['#3ee0a8','#eec065','#5aa9e6','#f0655f','#9b8cf2','#e88fc0','#7fd4d0'];
 
 /* ============================================================
    DASHBOARD
@@ -1122,6 +1393,14 @@ const Dash = {
         ${c.delta!==undefined ? `<span class="delta ${c.delta>=0?'up':'down'}"><i class="fa-solid ${c.delta>=0?'fa-arrow-up':'fa-arrow-down'}"></i> ${Math.abs(c.delta)}% vs last month</span>` : ''}
       </div>`).join('');
 
+    // Motivation widget uses the same /dashboard payload
+    document.getElementById('motivationWidget').innerHTML = `
+      <h4><i class="fa-solid fa-fire"></i>Today's Focus</h4>
+      <div class="motivation-quote">"${esc(d.motivation_quote||'')}"</div>
+      <div style="font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;">Mission: ${esc(d.mission_objective||'')}</div>
+      <ul class="priority-list">${(d.todays_priorities||[]).map(p=>`<li><i class="fa-solid fa-circle"></i>${esc(p)}</li>`).join('')}</ul>
+    `;
+
     let charts;
     try{ charts = await api('/dashboard/charts?days=30'); }catch(e){ charts = null; }
     if(charts){
@@ -1146,6 +1425,94 @@ const Dash = {
     }catch(e){
       document.getElementById('dashInsight').textContent = 'Insights will appear once you have some transaction history.';
     }
+
+    try{
+      const rec = await api('/ai/daily-recommendations');
+      const list = document.getElementById('dashRecList');
+      list.innerHTML = (rec.recommendations||[]).map(r=>`<li><i class="fa-solid fa-circle"></i>${esc(r)}</li>`).join('') || '<li class="text-dim">No recommendations yet.</li>';
+    }catch(e){
+      document.getElementById('dashRecList').innerHTML = '<li class="text-dim">Recommendations will appear once you have activity.</li>';
+    }
+
+    Mission.load();
+    HotspotWidget.load();
+    ExecScoreWidget.load();
+  }
+};
+
+/* ============================================================
+   MISSION CONTROL
+   ============================================================ */
+const Mission = {
+  async load(){
+    const box = document.getElementById('missionCard');
+    let m;
+    try{ m = await api('/mission'); }catch(e){ box.innerHTML = '<p class="text-dim">Could not load mission.</p>'; return; }
+    if(!m.start_date || !m.end_date){
+      box.innerHTML = `
+        <div class="mc-eyebrow"><i class="fa-solid fa-compass"></i>Mission Control</div>
+        <h2>${esc(m.title||'Set up your mission')}</h2>
+        <p class="text-dim" style="font-size:13px;margin-top:6px;">Set a start and end date in Settings to see your mission progress here.</p>
+        <button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="App.goSection('settings')"><i class="fa-solid fa-gear"></i> Set up mission</button>
+      `;
+      return;
+    }
+    box.innerHTML = `
+      <div class="mc-top">
+        <div>
+          <div class="mc-eyebrow"><i class="fa-solid fa-compass"></i>Mission Control</div>
+          <h2>${esc(m.title)}</h2>
+          <div class="mc-dates"><b>${fmtDate(m.start_date)}</b> &rarr; <b>${fmtDate(m.end_date)}</b></div>
+        </div>
+        <span class="mc-phase-pill"><i class="fa-solid fa-flag"></i> ${esc(m.current_phase||'Phase 1')}</span>
+      </div>
+      <div class="mc-progress-row">
+        <div class="progress-track"><div class="progress-fill" style="width:${m.percent_complete||0}%;"></div></div>
+        <div class="mc-pct">${m.percent_complete||0}%</div>
+      </div>
+      <div class="mc-stats">
+        <span>Days completed: <b>${m.days_completed ?? '—'}</b></span>
+        <span>Days remaining: <b>${m.days_remaining ?? '—'}</b></span>
+        <span>Total duration: <b>${m.total_days ?? '—'} days</b></span>
+      </div>
+    `;
+  }
+};
+
+const HotspotWidget = {
+  async load(){
+    const box = document.getElementById('hotspotWidget');
+    let p;
+    try{ p = await api('/hotspots/projection'); }catch(e){ box.innerHTML = '<h4><i class="fa-solid fa-wifi"></i>Hotspot Progress</h4><p class="text-dim">Unavailable.</p>'; return; }
+    box.innerHTML = `
+      <h4><i class="fa-solid fa-wifi"></i>Hotspot Progress</h4>
+      <div class="hs-mini-row">
+        <div class="hs-mini"><b>${p.current}</b><span>Current</span></div>
+        <div class="hs-mini"><b>${p.target}</b><span>Target</span></div>
+        <div class="hs-mini" style="color:var(--emerald);"><b>${p.completion_percent}%</b><span>Progress</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${p.completion_percent}%;"></div></div>
+      ${p.days_until_target!=null ? `<p class="hint" style="margin-top:10px;">You can afford another hotspot in about <b style="color:var(--text-0);">${p.days_until_target} day(s)</b> at your current savings rate.</p>` : ''}
+    `;
+  }
+};
+
+const ExecScoreWidget = {
+  async load(){
+    const box = document.getElementById('execScoreWidget');
+    let d;
+    try{ d = await api('/execution-score/today'); }catch(e){ box.innerHTML = '<h4><i class="fa-solid fa-bolt"></i>Today\'s Execution Score</h4><p class="text-dim">Unavailable.</p>'; return; }
+    box.innerHTML = `
+      <h4><i class="fa-solid fa-bolt"></i>Today's Execution Score</h4>
+      <div class="ringwrap">
+        <div class="ring" style="--p:${d.score};"><span>${Math.round(d.score)}%</span></div>
+        <div class="ring-meta">
+          <div class="rm-label">${d.score>=80?'Excellent day':d.score>=50?'Solid progress':'Room to improve'}</div>
+          Revenue ${d.breakdown.revenue_recorded?'✔':'✘'} · Expenses ${d.breakdown.expenses_recorded?'✔':'✘'} · Savings ${d.breakdown.savings_updated?'✔':'✘'} · Journal ${d.breakdown.journal_completed?'✔':'✘'}
+        </div>
+      </div>
+      <ul class="suggestlist">${(d.suggestions||[]).slice(0,3).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+    `;
   }
 };
 
@@ -1447,7 +1814,7 @@ const Hot = {
     document.getElementById('hotspotProjectionCards').innerHTML = Array(4).fill('<div class="statcard glass"><div class="skel" style="height:60px;"></div></div>').join('');
     document.getElementById('hotspotTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:180px;"></div></div>';
     try{ Hot.data = await api('/hotspots'); }catch(e){ Hot.data = []; }
-    let proj = {current:0,projection_6_months:0,projection_1_year:0,projection_2_years:0};
+    let proj = {current:0,target:0,projection_6_months:0,projection_1_year:0,projection_2_years:0};
     try{ proj = await api('/hotspots/projection'); }catch(e){}
     Hot.renderProjection(proj);
     Hot.render();
@@ -1455,8 +1822,8 @@ const Hot = {
   renderProjection(p){
     document.getElementById('hotspotProjectionCards').innerHTML = `
       <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-wifi"></i></div><div class="lbl">Current Hotspots</div><div class="val">${p.current}</div></div>
-      <div class="statcard glass"><div class="icn ic-bl"><i class="fa-solid fa-chart-line"></i></div><div class="lbl">Projected in 6 months</div><div class="val">${p.projection_6_months}</div></div>
-      <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-seedling"></i></div><div class="lbl">Projected in 1 year</div><div class="val">${p.projection_1_year}</div></div>
+      <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-bullseye"></i></div><div class="lbl">Target Hotspots</div><div class="val">${p.target}</div></div>
+      <div class="statcard glass"><div class="icn ic-bl"><i class="fa-solid fa-chart-line"></i></div><div class="lbl">Projected in 1 year</div><div class="val">${p.projection_1_year}</div></div>
       <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-crown"></i></div><div class="lbl">Projected in 2 years</div><div class="val">${p.projection_2_years}</div></div>
     `;
   },
@@ -1670,7 +2037,11 @@ const Goal = {
           <span class="text-dim">${fmtMoney(g.current_amount)} of ${fmtMoney(g.target_amount)}</span>
           <b>${g.progress_percent}%</b>
         </div>
-        <div class="text-dim" style="font-size:11.5px;margin-top:4px;">${g.deadline? 'Deadline '+fmtDate(g.deadline) : 'No deadline set'} · ${fmtMoney(g.amount_remaining)} remaining</div>
+        <div class="goal-extra">
+          <span>${g.deadline? 'Deadline '+fmtDate(g.deadline) : 'No deadline set'}</span>
+          <span><b>${fmtMoney(g.amount_remaining)}</b> remaining</span>
+        </div>
+        ${g.estimated_completion_date ? `<div class="goal-extra" style="margin-top:2px;"><span>Est. completion: <b>${fmtDate(g.estimated_completion_date)}</b></span></div>` : ''}
         <div class="rowactions" style="margin-top:14px;">
           <button class="btn btn-ghost btn-sm" onclick="Goal.openUpdateProgress(${g.id})"><i class="fa-solid fa-arrow-up"></i> Update</button>
           <button class="btn btn-ghost btn-sm" onclick="Goal.remove(${g.id})"><i class="fa-solid fa-trash"></i></button>
@@ -1727,6 +2098,7 @@ const AI = {
     document.getElementById('aiInsightsGrid').innerHTML = Array(4).fill('<div class="aicard glass"><div class="skel" style="height:70px;"></div></div>').join('');
     await AI.refresh();
     AI.loadHistory();
+    AI.loadRecommendations();
   },
   async refresh(){
     let data;
@@ -1736,6 +2108,13 @@ const AI = {
     grid.innerHTML = data.insights.map(txt=>`
       <div class="aicard glass"><div class="aiTag"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Insight</span></div><p>${esc(txt)}</p></div>
     `).join('');
+  },
+  async loadRecommendations(){
+    let data;
+    try{ data = await api('/ai/daily-recommendations'); }catch(e){ data = null; }
+    const list = document.getElementById('aiRecList');
+    const recs = (data && data.recommendations) || [];
+    list.innerHTML = recs.length ? recs.map(r=>`<li><i class="fa-solid fa-circle"></i>${esc(r)}</li>`).join('') : '<li class="text-dim">No recommendations yet — add some activity first.</li>';
   },
   async loadHistory(){
     let hist;
@@ -1756,11 +2135,230 @@ document.getElementById('refreshAiBtn').onclick = async ()=>{
 };
 
 /* ============================================================
-   REPORTS
+   DAILY JOURNAL
+   ============================================================ */
+const Journal = {
+  data: [],
+  async load(){
+    document.getElementById('journalSearch').value = '';
+    await Journal.loadToday();
+    await Journal.fetchList();
+  },
+  async loadToday(){
+    try{
+      const list = await api('/journal?limit=60');
+      const today = new Date().toISOString().slice(0,10);
+      const entry = list.find(j=>j.date===today);
+      document.getElementById('jAccomplished').value = entry ? entry.accomplished : '';
+      document.getElementById('jChallenges').value = entry ? entry.challenges : '';
+      document.getElementById('jLearned').value = entry ? entry.learned : '';
+      document.getElementById('jImprove').value = entry ? entry.improve_tomorrow : '';
+      Journal.data = list;
+    }catch(e){}
+  },
+  async fetchList(){
+    const box = document.getElementById('journalList');
+    box.innerHTML = '<div class="skel" style="height:120px;"></div>';
+    try{ Journal.data = await api('/journal?limit=60'); }catch(e){ Journal.data = []; }
+    Journal.render(Journal.data);
+  },
+  render(list){
+    const box = document.getElementById('journalList');
+    if(!list.length){
+      box.innerHTML = `<div class="glass"><div class="emptystate"><i class="fa-solid fa-book-open"></i><h4>No journal entries yet</h4><p>Fill in today's entry on the left to get started.</p></div></div>`;
+      return;
+    }
+    box.innerHTML = list.map(j=>`
+      <div class="journal-entry glass">
+        <div class="je-date">${fmtDate(j.date)}</div>
+        ${j.accomplished?`<div class="je-row"><b>Accomplished</b><span>${esc(j.accomplished)}</span></div>`:''}
+        ${j.challenges?`<div class="je-row"><b>Challenges</b><span>${esc(j.challenges)}</span></div>`:''}
+        ${j.learned?`<div class="je-row"><b>Learned</b><span>${esc(j.learned)}</span></div>`:''}
+        ${j.improve_tomorrow?`<div class="je-row"><b>Improve tomorrow</b><span>${esc(j.improve_tomorrow)}</span></div>`:''}
+      </div>
+    `).join('');
+  },
+  async search(q){
+    if(!q){ Journal.render(Journal.data); return; }
+    try{
+      const results = await api('/journal/search?q='+encodeURIComponent(q));
+      Journal.render(results);
+    }catch(e){}
+  }
+};
+document.getElementById('saveJournalBtn').onclick = async ()=>{
+  const body = {
+    accomplished: document.getElementById('jAccomplished').value.trim(),
+    challenges: document.getElementById('jChallenges').value.trim(),
+    learned: document.getElementById('jLearned').value.trim(),
+    improve_tomorrow: document.getElementById('jImprove').value.trim(),
+  };
+  await api('/journal', {method:'POST', body});
+  toast('Journal entry saved.', 'success');
+  Journal.fetchList();
+};
+let journalSearchTimer;
+document.getElementById('journalSearch').addEventListener('input', e=>{
+  clearTimeout(journalSearchTimer);
+  const q = e.target.value.trim();
+  journalSearchTimer = setTimeout(()=>Journal.search(q), 300);
+});
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+const Timeline = {
+  data: [],
+  async load(){
+    const wrap = document.getElementById('timelineWrap');
+    wrap.innerHTML = '<div class="skel" style="height:180px;"></div>';
+    try{ Timeline.data = await api('/timeline'); }catch(e){ Timeline.data = []; }
+    Timeline.render();
+  },
+  render(){
+    const wrap = document.getElementById('timelineWrap');
+    if(!Timeline.data.length){
+      wrap.innerHTML = `<div class="emptystate"><i class="fa-solid fa-road"></i><h4>No milestones yet</h4><p>Add the moments that mark real progress — first hotspot, first client, a big purchase.</p></div>`;
+      return;
+    }
+    const byYear = {};
+    Timeline.data.forEach(m=>{
+      const y = m.milestone_date.slice(0,4);
+      (byYear[y] = byYear[y] || []).push(m);
+    });
+    const years = Object.keys(byYear).sort();
+    wrap.innerHTML = years.map(y=>`
+      <div class="tl-year">${y}</div>
+      ${byYear[y].map(m=>`
+        <div class="tl-item glass">
+          <div class="tl-date">${fmtDate(m.milestone_date)}</div>
+          <div class="tl-title">${esc(m.title)}</div>
+          ${m.notes?`<div class="tl-notes">${esc(m.notes)}</div>`:''}
+          <button class="iconsm danger" style="margin-top:8px;" onclick="Timeline.remove(${m.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `).join('')}
+    `).join('');
+  },
+  async remove(id){
+    if(!confirm('Remove this milestone?')) return;
+    await api('/timeline/'+id, {method:'DELETE'});
+    toast('Milestone removed.', 'success'); Timeline.load();
+  }
+};
+document.getElementById('addMilestoneBtn').onclick = ()=>{
+  Modal.open('Add milestone', `
+    <div class="field"><label>Date</label><input type="date" id="f_date"></div>
+    <div class="field"><label>Title</label><input type="text" id="f_title" placeholder="e.g. Reached 5 Hotspots"></div>
+    <div class="field"><label>Notes</label><input type="text" id="f_notes" placeholder="Optional"></div>
+    <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save milestone</button></div>
+  `, ()=>{
+    document.getElementById('f_date').valueAsDate = new Date();
+    document.getElementById('f_submit').onclick = async ()=>{
+      const title = document.getElementById('f_title').value.trim();
+      if(!title) return toast('Title is required.', 'error');
+      await api('/timeline', {method:'POST', body:{
+        milestone_date: document.getElementById('f_date').value,
+        title, notes: document.getElementById('f_notes').value.trim(),
+      }});
+      toast('Milestone added.', 'success'); Modal.close(); Timeline.load();
+    };
+  });
+};
+
+/* ============================================================
+   BUSINESS EMPIRE + INCOME DISTRIBUTION
+   ============================================================ */
+const Empire = {
+  async load(){
+    const grid = document.getElementById('empireGrid');
+    grid.innerHTML = Array(4).fill('<div class="empire-card glass"><div class="skel" style="height:120px;"></div></div>').join('');
+    let rows;
+    try{ rows = await api('/business-empire'); }catch(e){ rows = []; }
+    if(!rows.length){
+      grid.innerHTML = `<div class="glass" style="grid-column:1/-1;"><div class="emptystate"><i class="fa-solid fa-crown"></i><h4>No businesses yet</h4><p>Add a business to see it appear here as part of your empire.</p></div></div>`;
+    }else{
+      grid.innerHTML = rows.map(b=>`
+        <div class="empire-card glass">
+          <div class="ec-top">
+            <div><div class="ec-name">${esc(b.name)}</div><div class="ec-cat">${esc(b.category)}</div></div>
+            <span class="pill ${b.status==='active'?'pill-em':'pill-gr'}">${esc(b.status)}</span>
+          </div>
+          <div class="ec-metrics">
+            <div class="ec-metric"><span>Revenue</span><b>${fmtMoney(b.revenue)}</b></div>
+            <div class="ec-metric"><span>Expenses</span><b>${fmtMoney(b.expenses)}</b></div>
+            <div class="ec-metric"><span>Profit</span><b style="color:${b.profit>=0?'var(--emerald)':'#ff9d97'}">${fmtMoney(b.profit)}</b></div>
+            <div class="ec-metric"><span>Growth</span><b style="color:${b.growth_percent>=0?'var(--emerald)':'#ff9d97'}">${b.growth_percent>=0?'+':''}${b.growth_percent}%</b></div>
+            <div class="ec-metric"><span>Investment</span><b>${fmtMoney(b.investment)}</b></div>
+            <div class="ec-metric"><span>ROI</span><b>${b.roi_percent!=null ? b.roi_percent+'%' : '—'}</b></div>
+          </div>
+          ${b.days_inactive!=null && b.days_inactive>=14 ? `<p class="hint" style="margin-top:10px;color:#ffb3af;"><i class="fa-solid fa-triangle-exclamation"></i> No activity in ${b.days_inactive} days</p>` : ''}
+        </div>
+      `).join('');
+    }
+
+    let income;
+    try{ income = await api('/income-distribution?days=90'); }catch(e){ income = {businesses:[]}; }
+    const list = income.businesses || [];
+    pieChart('chartIncomePie','incomePie', list.map(x=>x.name), list.map(x=>x.revenue), PALETTE);
+    barChart('chartIncomeBar','incomeBar', list.map(x=>x.name+' ('+x.percent+'%)'), list.map(x=>x.revenue), PALETTE);
+  }
+};
+
+/* ============================================================
+   ANALYTICS (trends + forecast)
+   ============================================================ */
+const Analytics = {
+  async load(){
+    let charts;
+    try{ charts = await api('/dashboard/charts?days=90'); }catch(e){ charts = null; }
+    if(charts){
+      const labels = charts.labels.map(l=>l.slice(5));
+      lineChart('chartAnalyticsRevenue','anRev', labels, [
+        {label:'Revenue', data:charts.revenue, borderColor:'#34d399', backgroundColor:'rgba(52,211,153,0.10)', fill:true, tension:.3, pointRadius:0, borderWidth:2},
+        {label:'Expense', data:charts.expense, borderColor:'#f0655f', backgroundColor:'rgba(240,101,95,0.08)', fill:true, tension:.3, pointRadius:0, borderWidth:2},
+      ]);
+      lineChart('chartAnalyticsSavings','anSav', labels, [
+        {label:'Savings balance', data:charts.savings_growth, borderColor:'#5aa9e6', backgroundColor:'rgba(90,169,230,0.10)', fill:true, tension:.3, pointRadius:0, borderWidth:2},
+      ]);
+    }
+    let f;
+    try{ f = await api('/analytics/forecast?months_history=6&months_forward=12'); }catch(e){ f = null; }
+    if(f){
+      const histLabels = f.history.map(h=>h.month);
+      const foreLabels = f.forecast.map(h=>h.month);
+      const labels = [...histLabels, ...foreLabels];
+      const histData = f.history.map(h=>h.profit).concat(Array(foreLabels.length).fill(null));
+      const foreData = Array(histLabels.length-1).fill(null).concat([f.history[f.history.length-1]?.profit ?? null], f.forecast.map(h=>h.projected_profit));
+      lineChart('chartForecast','forecast', labels, [
+        {label:'Actual monthly profit', data:histData, borderColor:'#3ee0a8', backgroundColor:'rgba(62,224,168,0.1)', fill:true, tension:.3, pointRadius:2, borderWidth:2, spanGaps:false},
+        {label:'Forecast', data:foreData, borderColor:'#eec065', borderDash:[6,4], backgroundColor:'rgba(238,192,101,0.08)', fill:true, tension:.3, pointRadius:2, borderWidth:2, spanGaps:true},
+      ]);
+      const trendWord = f.monthly_trend>0 ? 'trending up' : f.monthly_trend<0 ? 'trending down' : 'roughly flat';
+      document.getElementById('forecastHint').textContent = `Based on the last ${f.history.length} months, monthly profit is ${trendWord} by about ${fmtMoney(Math.abs(f.monthly_trend))} per month. This is a directional estimate, not a guarantee.`;
+    }
+  }
+};
+
+/* ============================================================
+   REPORTS + WEEKLY / MONTHLY REVIEW
    ============================================================ */
 const Rep = {
   data: null,
+  activeTab: 'summary',
   async load(){
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      b.onclick = ()=>{ Rep.switchTab(b.dataset.tab); };
+    });
+    await Rep.loadSummary();
+  },
+  switchTab(tab){
+    Rep.activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+    ['summary','weekly','monthly'].forEach(t=>document.getElementById('reportTab-'+t).classList.toggle('hidden', t!==tab));
+    if(tab==='weekly') Rep.loadWeekly();
+    if(tab==='monthly') Rep.loadMonthly();
+  },
+  async loadSummary(){
     document.getElementById('reportCards').innerHTML = Array(3).fill('<div class="statcard glass"><div class="skel" style="height:60px;"></div></div>').join('');
     document.getElementById('reportTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:180px;"></div></div>';
     const period = document.getElementById('reportPeriod').value;
@@ -1784,6 +2382,48 @@ const Rep = {
         <td style="text-align:right;font-family:var(--font-mono);">${fmtMoney(t.amount)}</td></tr>`).join('')}
     </tbody></table>`;
   },
+  async loadWeekly(){
+    const grid = document.getElementById('weeklyReviewGrid');
+    grid.innerHTML = Array(4).fill('<div class="review-mini glass"><div class="skel" style="height:40px;"></div></div>').join('');
+    let w;
+    try{ w = await api('/reviews/weekly'); }catch(e){ grid.innerHTML = '<p class="text-dim">Could not load weekly review.</p>'; return; }
+    grid.innerHTML = `
+      <div class="review-mini glass"><span>Total Revenue</span><b>${fmtMoney(w.total_revenue)}</b></div>
+      <div class="review-mini glass"><span>Total Expense</span><b>${fmtMoney(w.total_expense)}</b></div>
+      <div class="review-mini glass"><span>Total Profit</span><b style="color:var(--emerald);">${fmtMoney(w.total_profit)}</b></div>
+      <div class="review-mini glass"><span>Best Business</span><b>${esc(w.best_business||'—')}</b></div>
+      <div class="review-mini glass"><span>Worst Business</span><b>${esc(w.worst_business||'—')}</b></div>
+      <div class="review-mini glass"><span>Savings This Week</span><b>${fmtMoney(w.savings_this_week)}</b></div>
+      <div class="review-mini glass"><span>Investments This Week</span><b>${fmtMoney(w.investments_this_week)}</b></div>
+      <div class="review-mini glass"><span>Avg Execution Score</span><b>${w.avg_execution_score!=null ? w.avg_execution_score+'%' : '—'}</b></div>
+    `;
+    const lessons = document.getElementById('weeklyLessons');
+    lessons.innerHTML = (w.lessons_learned && w.lessons_learned.length)
+      ? w.lessons_learned.map(l=>`<div class="lesson-item">${esc(l)}</div>`).join('')
+      : '<p class="text-dim" style="font-size:13px;">No journal lessons logged this week yet.</p>';
+  },
+  async loadMonthly(){
+    const grid = document.getElementById('monthlyReviewGrid');
+    grid.innerHTML = Array(4).fill('<div class="review-mini glass"><div class="skel" style="height:40px;"></div></div>').join('');
+    let m;
+    try{ m = await api('/reviews/monthly'); }catch(e){ grid.innerHTML = '<p class="text-dim">Could not load monthly review.</p>'; return; }
+    grid.innerHTML = `
+      <div class="review-mini glass"><span>Revenue</span><b>${fmtMoney(m.revenue)}</b></div>
+      <div class="review-mini glass"><span>Expense</span><b>${fmtMoney(m.expense)}</b></div>
+      <div class="review-mini glass"><span>Profit</span><b style="color:var(--emerald);">${fmtMoney(m.profit)}</b></div>
+      <div class="review-mini glass"><span>Net Worth</span><b>${fmtMoney(m.net_worth)}</b></div>
+      <div class="review-mini glass"><span>Savings Balance</span><b>${fmtMoney(m.savings_balance)}</b></div>
+      <div class="review-mini glass"><span>Savings Growth</span><b>${fmtMoney(m.savings_growth)}</b></div>
+      <div class="review-mini glass"><span>Asset Value</span><b>${fmtMoney(m.asset_value)}</b></div>
+      <div class="review-mini glass"><span>Investment Growth</span><b>${fmtMoney(m.investment_growth)}</b></div>
+    `;
+    const wrap = document.getElementById('monthlyCompareWrap');
+    const comp = m.business_comparison || [];
+    if(!comp.length){ wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-file-lines','No business activity this month','Come back once you have some transactions logged.')}</tbody></table>`; return; }
+    wrap.innerHTML = `<table class="datatable"><thead><tr><th>Business</th><th>Revenue</th><th>Expense</th><th>Profit</th></tr></thead><tbody>
+      ${comp.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${fmtMoney(c.revenue)}</td><td>${fmtMoney(c.expense)}</td><td style="color:${c.profit>=0?'var(--emerald)':'#ff9d97'}">${fmtMoney(c.profit)}</td></tr>`).join('')}
+    </tbody></table>`;
+  },
   exportCsv(){
     if(!Rep.data || !Rep.data.transactions.length) return toast('Nothing to export for this period.', 'error');
     const bizName = id => (State.businesses.find(b=>b.id===id)||{}).name || '';
@@ -1798,7 +2438,7 @@ const Rep = {
     toast('CSV exported.', 'success');
   }
 };
-document.getElementById('reportPeriod').addEventListener('change', Rep.load);
+document.getElementById('reportPeriod').addEventListener('change', ()=>Rep.loadSummary());
 document.getElementById('exportCsvBtn').onclick = ()=>Rep.exportCsv();
 document.getElementById('printReportBtn').onclick = ()=>window.print();
 
@@ -1806,10 +2446,20 @@ document.getElementById('printReportBtn').onclick = ()=>window.print();
    SETTINGS
    ============================================================ */
 const Settings = {
-  load(){
+  async load(){
     document.getElementById('setName').value = State.user.full_name;
     document.getElementById('setCurrency').value = State.user.currency;
     document.getElementById('setApiBase').value = State.apiBase;
+    try{
+      const m = await api('/mission');
+      document.getElementById('setMissionTitle').value = m.title || '';
+      if(m.start_date) document.getElementById('setMissionStart').value = m.start_date;
+      if(m.end_date) document.getElementById('setMissionEnd').value = m.end_date;
+    }catch(e){}
+    try{
+      const p = await api('/hotspots/projection');
+      document.getElementById('setTargetHotspots').value = p.target || 7;
+    }catch(e){ document.getElementById('setTargetHotspots').value = 7; }
   }
 };
 document.getElementById('saveProfileBtn').onclick = async ()=>{
@@ -1823,6 +2473,16 @@ document.getElementById('saveProfileBtn').onclick = async ()=>{
   document.getElementById('userAvatar').textContent = updated.full_name.trim().charAt(0).toUpperCase();
   document.getElementById('setPassword').value = '';
   toast('Profile updated.', 'success');
+};
+document.getElementById('saveMissionBtn').onclick = async ()=>{
+  const body = {
+    title: document.getElementById('setMissionTitle').value.trim(),
+    start_date: document.getElementById('setMissionStart').value || null,
+    end_date: document.getElementById('setMissionEnd').value || null,
+    target_hotspot_count: parseInt(document.getElementById('setTargetHotspots').value) || null,
+  };
+  await api('/mission', {method:'PUT', body});
+  toast('Mission updated.', 'success');
 };
 document.getElementById('saveApiBaseBtn').onclick = ()=>{
   const val = document.getElementById('setApiBase').value.trim().replace(/\/$/,'');
@@ -1849,6 +2509,7 @@ async function boot(){
 boot();
 
 })();
+
 </script>
 </body>
-   </html>
+</html>
