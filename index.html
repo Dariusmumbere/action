@@ -2877,6 +2877,41 @@ document.getElementById('saveApiBaseBtn').onclick = ()=>{
 };
 
 /* ============================================================
+   GLOBAL EXPOSURE — FIX
+   ------------------------------------------------------------
+   Everything above lives inside this IIFE's closure. But table
+   rows, goal cards, and todo items are rendered via innerHTML
+   with inline `onclick="Tx.openEdit(5)"` style attributes, and
+   inline event-handler attributes execute in the GLOBAL scope.
+   Without this block, `Tx`, `Todo`, `Goal`, `Biz`, `Hot`, `Inv`,
+   `Asset`, `Timeline` and the `App.goSection(...)` buttons in the
+   static HTML would all throw "X is not defined" the moment they
+   were clicked — which is exactly why edit / delete / update /
+   toggle-complete actions appeared to silently do nothing while
+   the "Add" buttons (wired with addEventListener to local consts)
+   kept working fine.
+   ============================================================ */
+window.App = App;
+window.Sidebar = Sidebar;
+window.Modal = Modal;
+window.Biz = Biz;
+window.Tx = Tx;
+window.Sav = Sav;
+window.Hot = Hot;
+window.Inv = Inv;
+window.Asset = Asset;
+window.Goal = Goal;
+window.Todo = Todo;
+window.AI = AI;
+window.Chat = Chat;
+window.Journal = Journal;
+window.Timeline = Timeline;
+window.Empire = Empire;
+window.Analytics = Analytics;
+window.Rep = Rep;
+window.Settings = Settings;
+
+/* ============================================================
    BOOTSTRAP
    ============================================================ */
 async function boot(){
