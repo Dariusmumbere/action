@@ -1371,7 +1371,7 @@ const App = {
   async loadAllInitialData(){
     try{ State.businesses = await api('/businesses'); }catch(e){ State.businesses = []; }
     Notif.poll();
-    apiSilent('/notifications/check').then(()=>Notif.poll());
+    apiSilent('/notifications/check', {method:'POST'}).then(()=>Notif.poll());
   }
 };
 document.querySelectorAll('.navlink[data-section]').forEach(a=>{
@@ -1428,7 +1428,7 @@ document.addEventListener('click', e=>{
   if(drop.classList.contains('open') && !drop.contains(e.target) && e.target.id!=='notifBtn' && !e.target.closest('#notifBtn')) drop.classList.remove('open');
 });
 /* Re-run the smart notification rules periodically while the app is open */
-setInterval(()=>{ if(State.token) apiSilent('/notifications/check').then(()=>Notif.poll()); }, 5*60*1000);
+setInterval(()=>{ if(State.token) apiSilent('/notifications/check', {method:'POST'}).then(()=>Notif.poll()); }, 5*60*1000);
 
 /* ============================================================
    CHART HELPERS
