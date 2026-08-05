@@ -962,10 +962,10 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
             <h3 class="mb-0"><i class="fa-solid fa-comments" style="color:var(--emerald);margin-right:8px;"></i>Chat with your AI Advisor</h3>
             <button class="btn btn-ghost btn-sm" id="clearChatBtn"><i class="fa-solid fa-trash"></i> Clear chat</button>
           </div>
-          <p class="hint" style="margin-bottom:14px;">Aware of every business, goal, task, savings balance, mission timeline, and score in your account.</p>
+          <p class="hint" style="margin-bottom:14px;">Aware of every business, goal, task, savings balance, mission timeline, non-negotiable principle, and score in your account.</p>
           <div class="chatpanel glass">
             <div class="chatMessages" id="chatMessages">
-              <div class="chatEmpty" id="chatEmptyState">Ask about your businesses, goals, tasks, or what to focus on today.</div>
+              <div class="chatEmpty" id="chatEmptyState">Ask about your businesses, goals, tasks, principles, or what to focus on today.</div>
             </div>
             <div class="chatInputRow">
               <textarea id="chatInput" rows="1" placeholder="Ask your AI Advisor anything about your business…"></textarea>
@@ -1059,7 +1059,7 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 
       <!-- SETTINGS -->
       <section class="section" id="section-settings">
-        <div class="sectionHead" style="margin-bottom:20px;"><h2>Settings</h2><p>Your profile, mission, and connection preferences.</p></div>
+        <div class="sectionHead" style="margin-bottom:20px;"><h2>Settings</h2><p>Your profile, mission, non-negotiable principles, and connection preferences.</p></div>
         <div class="glass" style="padding:24px;max-width:480px;margin-bottom:18px;">
           <h3 style="font-family:var(--font-display);margin-bottom:16px;font-size:15.5px;">Profile</h3>
           <div class="field"><label>Full name</label><input type="text" id="setName"></div>
@@ -1082,6 +1082,14 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           </div>
           <div class="field"><label>Target hotspot count</label><input type="number" id="setTargetHotspots" min="1"></div>
           <button class="btn btn-primary" id="saveMissionBtn"><i class="fa-solid fa-check"></i> Save mission</button>
+        </div>
+        <div class="glass" style="padding:24px;max-width:480px;margin-bottom:18px;">
+          <h3 style="font-family:var(--font-display);margin-bottom:6px;font-size:15.5px;">Non-negotiable principles</h3>
+          <p class="hint" style="margin-bottom:14px;">Rules you'll never break. The AI Advisor sees these on every reply and treats them as hard limits.</p>
+          <div class="field"><label>Principle</label><input type="text" id="setPrincipleTitle" placeholder="e.g. Never spend savings before recording the sale"></div>
+          <div class="field"><label>Description <span class="text-dim">(optional)</span></label><input type="text" id="setPrincipleDesc" placeholder="Why this matters to you"></div>
+          <button class="btn btn-primary" id="addPrincipleBtn"><i class="fa-solid fa-plus"></i> Add principle</button>
+          <div id="principlesList" style="margin-top:16px;"></div>
         </div>
         <div class="glass" style="padding:24px;max-width:480px;">
           <h3 style="font-family:var(--font-display);margin-bottom:6px;font-size:15.5px;">API connection</h3>
@@ -2995,7 +3003,55 @@ const Settings = {
       const p = await api('/hotspots/projection');
       document.getElementById('setTargetHotspots').value = p.target || 7;
     }catch(e){ document.getElementById('setTargetHotspots').value = 7; }
+    Principles.load();
   }
+};
+
+/* ============================================================
+   NON-NEGOTIABLE PRINCIPLES — set here; fed to the AI Advisor
+   on every request so its advice always stays within them.
+   ============================================================ */
+const Principles = {
+  data: [],
+  async load(){
+    const wrap = document.getElementById('principlesList');
+    wrap.innerHTML = '<p class="text-dim" style="font-size:13px;">Loading…</p>';
+    try{ Principles.data = await api('/principles'); }catch(e){ Principles.data = []; }
+    Principles.render();
+  },
+  render(){
+    const wrap = document.getElementById('principlesList');
+    if(!Principles.data.length){
+      wrap.innerHTML = '<p class="text-dim" style="font-size:13px;">No principles set yet — add one above.</p>';
+      return;
+    }
+    wrap.innerHTML = Principles.data.map(p=>`
+      <div class="notifItem" style="border:1px solid var(--panel-border);margin-bottom:8px;">
+        <div class="rowbetween">
+          <b style="font-size:13px;">${esc(p.title)}</b>
+          <button class="btn btn-ghost btn-sm" onclick="Principles.remove(${p.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        ${p.description ? `<div class="t">${esc(p.description)}</div>` : ''}
+      </div>`).join('');
+  },
+  async remove(id){
+    if(!confirm('Delete this principle?')) return;
+    try{
+      await api('/principles/'+id, {method:'DELETE'});
+      toast('Principle deleted.', 'success'); Principles.load();
+    }catch(e){ /* api() already shows an error toast */ }
+  }
+};
+document.getElementById('addPrincipleBtn').onclick = async ()=>{
+  const title = document.getElementById('setPrincipleTitle').value.trim();
+  if(!title) return toast('Enter a principle.', 'error');
+  const description = document.getElementById('setPrincipleDesc').value.trim();
+  try{
+    await api('/principles', {method:'POST', body:{title, description}});
+    document.getElementById('setPrincipleTitle').value = '';
+    document.getElementById('setPrincipleDesc').value = '';
+    toast('Principle added.', 'success'); Principles.load();
+  }catch(e){ /* api() already shows an error toast */ }
 };
 document.getElementById('saveProfileBtn').onclick = async ()=>{
   const body = { full_name: document.getElementById('setName').value.trim(), currency: document.getElementById('setCurrency').value };
@@ -3062,6 +3118,7 @@ window.Empire = Empire;
 window.Analytics = Analytics;
 window.Rep = Rep;
 window.Settings = Settings;
+window.Principles = Principles;
 
 /* ============================================================
    BOOTSTRAP
