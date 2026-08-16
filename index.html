@@ -486,6 +486,30 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 .goal-extra{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-2);gap:8px;flex-wrap:wrap;}
 .goal-extra b{color:var(--text-1);}
 
+/* Goal deadline alert banner */
+.goal-alert{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:8px 10px;border-radius:10px;font-size:11.5px;line-height:1.4;}
+.goal-alert i{margin-top:1.5px;flex-shrink:0;}
+.goal-alert.lvl-danger{background:rgba(240,101,95,0.14);color:#ff9d97;}
+.goal-alert.lvl-warning{background:rgba(232,184,75,0.15);color:var(--gold);}
+.goal-alert.lvl-info{background:rgba(126,211,171,0.1);color:var(--text-0);}
+.goal-alert.lvl-success{background:rgba(52,211,153,0.14);color:var(--emerald);}
+
+/* Priority badge */
+.goal-priority{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:2px 7px;border-radius:20px;}
+.goal-priority.p-high{background:rgba(240,101,95,0.14);color:#ff9d97;}
+.goal-priority.p-medium{background:rgba(232,184,75,0.15);color:var(--gold);}
+.goal-priority.p-low{background:rgba(183,201,193,0.1);color:var(--text-1);}
+
+/* Pace badge */
+.goal-pace{font-size:10.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;}
+.goal-pace.pace-ahead{color:var(--emerald);}
+.goal-pace.pace-on_track{color:var(--text-0);}
+.goal-pace.pace-behind{color:#ff9d97;}
+
+.goal-days-badge{font-family:var(--font-display);font-weight:700;}
+.goal-days-badge.overdue{color:#ff9d97;}
+.goal-days-badge.soon{color:var(--gold);}
+
 /* Journal */
 .journalgrid{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start;}
 @media (max-width:900px){.journalgrid{grid-template-columns:1fr;}}
@@ -895,9 +919,10 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
       <!-- GOALS -->
       <section class="section" id="section-goals">
         <div class="rowbetween sectionHead">
-          <div><h2>Financial Goals</h2><p>Name the target. Watch the progress.</p></div>
+          <div><h2>Financial Goals</h2><p>Name the target. Watch the progress. Never miss a deadline.</p></div>
           <button class="btn btn-primary" id="addGoalBtn"><i class="fa-solid fa-plus"></i> Add goal</button>
         </div>
+        <div id="goalsSummary"></div>
         <div class="aigrid" id="goalsGrid"></div>
       </section>
 
@@ -1181,6 +1206,22 @@ function fmtDateTime(d){
   if(isNaN(dt)) return d;
   return dt.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 }
+/* Local calendar date (YYYY-MM-DD) as seen on THIS device — never use
+   Date#toISOString() for "today"/"due date" purposes, it returns the UTC
+   date, which is a day off from the local date for part of every day in
+   any timezone ahead of or behind UTC. */
+function localDateStr(d){
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+/* Set a <input type="date"> to a local date without the UTC-shift that
+   input.valueAsDate = new Date() introduces near midnight. */
+function setDateInputToday(el){
+  if(el) el.value = localDateStr();
+}
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ============================================================
@@ -1201,7 +1242,7 @@ function toast(msg, type){
    ============================================================ */
 async function api(path, opts){
   opts = opts || {};
-  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  const headers = Object.assign({'Content-Type':'application/json', 'X-Client-Date': localDateStr()}, opts.headers||{});
   if(State.token) headers['Authorization'] = 'Bearer ' + State.token;
   let res, data;
   try{
@@ -1523,9 +1564,10 @@ const Dash = {
       {lbl:'Net Worth', val:d.net_worth, icn:'fa-crown', cls:'ic-em'},
       {lbl:'Businesses', val:d.business_count, icn:'fa-building', cls:'ic-bl', raw:true},
       {lbl:'Active Goals', val:d.active_goals, icn:'fa-bullseye', cls:'ic-rd', raw:true},
+      {lbl:'Goals Needing Attention', val:d.goals_needing_attention||0, icn:'fa-triangle-exclamation', cls: (d.goals_needing_attention>0?'ic-rd':'ic-em'), raw:true},
     ];
     grid.innerHTML = cards.map(c=>`
-      <div class="statcard glass">
+      <div class="statcard glass" ${c.lbl==='Goals Needing Attention' ? `style="cursor:pointer;" onclick="App.goSection('goals')"` : ''}>
         <div class="icn ${c.cls}"><i class="fa-solid ${c.icn}"></i></div>
         <div class="lbl">${c.lbl}</div>
         <div class="val">${c.raw ? c.val : fmtMoney(c.val)}</div>
@@ -1574,7 +1616,7 @@ const Dash = {
     }
 
     try{
-      const todos = await api('/todos?due_date=' + new Date().toISOString().slice(0,10));
+      const todos = await api('/todos?due_date=' + localDateStr());
       const list = document.getElementById('dashTodoList');
       if(!todos.length){
         list.innerHTML = '<li class="text-dim">No tasks scheduled for today — <a href="#" onclick="App.goSection(\'todos\');return false;" style="color:var(--emerald);">add some</a>.</li>';
@@ -1831,7 +1873,7 @@ const Tx = {
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save transaction</button></div>
     `, ()=>{
-      document.getElementById('f_date').valueAsDate = new Date();
+      setDateInputToday(document.getElementById('f_date'));
       document.getElementById('f_submit').onclick = async ()=>{
         const amount = parseFloat(document.getElementById('f_amount').value);
         if(!amount || amount<=0) return toast('Enter a valid amount.', 'error');
@@ -2052,7 +2094,7 @@ const Hot = {
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save hotspot</button></div>
     `, ()=>{
-      document.getElementById('f_idate').valueAsDate = new Date();
+      setDateInputToday(document.getElementById('f_idate'));
       document.getElementById('f_submit').onclick = async ()=>{
         const loc = document.getElementById('f_loc').value.trim();
         if(!loc) return toast('Location is required.', 'error');
@@ -2114,7 +2156,7 @@ const Inv = {
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save investment</button></div>
     `, ()=>{
-      document.getElementById('f_date').valueAsDate = new Date();
+      setDateInputToday(document.getElementById('f_date'));
       document.getElementById('f_submit').onclick = async ()=>{
         const name = document.getElementById('f_name').value.trim();
         const cost = parseFloat(document.getElementById('f_cost').value);
@@ -2177,7 +2219,7 @@ const Asset = {
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save asset</button></div>
     `, ()=>{
-      document.getElementById('f_date').valueAsDate = new Date();
+      setDateInputToday(document.getElementById('f_date'));
       document.getElementById('f_submit').onclick = async ()=>{
         const name = document.getElementById('f_name').value.trim();
         if(!name) return toast('Asset name is required.', 'error');
@@ -2209,8 +2251,28 @@ const Goal = {
     try{ Goal.data = await api('/goals'); }catch(e){ Goal.data = []; }
     Goal.render();
   },
+  _daysBadge(g){
+    if(g.status !== 'active' || g.days_remaining === null || g.days_remaining === undefined) return '';
+    if(g.is_overdue) return `<span class="goal-days-badge overdue">${Math.abs(g.days_remaining)}d overdue</span>`;
+    if(g.days_remaining === 0) return `<span class="goal-days-badge overdue">Due today</span>`;
+    const cls = g.days_remaining <= 7 ? 'soon' : '';
+    return `<span class="goal-days-badge ${cls}">${g.days_remaining}d left</span>`;
+  },
+  _paceBadge(g){
+    if(!g.pace_status) return '';
+    const label = g.pace_status === 'ahead' ? 'Ahead of pace' : g.pace_status === 'behind' ? 'Behind pace' : 'On track';
+    const icon = g.pace_status === 'ahead' ? 'fa-arrow-trend-up' : g.pace_status === 'behind' ? 'fa-arrow-trend-down' : 'fa-minus';
+    return `<span class="goal-pace pace-${g.pace_status}"><i class="fa-solid ${icon}"></i>${label}</span>`;
+  },
   render(){
     const grid = document.getElementById('goalsGrid');
+    const summaryEl = document.getElementById('goalsSummary');
+    const attention = Goal.data.filter(g=>g.status==='active' && (g.alert_level==='danger' || g.alert_level==='warning'));
+    if(summaryEl){
+      summaryEl.innerHTML = attention.length
+        ? `<div class="goal-alert lvl-${attention.some(g=>g.alert_level==='danger')?'danger':'warning'}" style="margin:0 0 14px;"><i class="fa-solid fa-triangle-exclamation"></i><span>${attention.length} goal${attention.length>1?'s need':' needs'} attention — ${attention.map(g=>esc(g.name)).join(', ')}.</span></div>`
+        : '';
+    }
     if(!Goal.data.length){
       grid.innerHTML = `<div class="glass" style="grid-column:1/-1;"><div class="emptystate"><i class="fa-solid fa-bullseye"></i><h4>No goals yet</h4><p>Set a target — rent, a car, a daily profit number — and track progress automatically.</p><button class="btn btn-primary btn-sm" id="emptyAddGoal"><i class="fa-solid fa-plus"></i> Add goal</button></div></div>`;
       document.getElementById('emptyAddGoal').onclick = Goal.openCreate;
@@ -2218,9 +2280,13 @@ const Goal = {
     }
     grid.innerHTML = Goal.data.map(g=>`
       <div class="aicard glass">
-        <div class="rowbetween mb-0" style="margin-bottom:10px;">
+        <div class="rowbetween mb-0" style="margin-bottom:8px;">
           <b style="font-family:var(--font-display);font-size:14.5px;">${esc(g.name)}</b>
           <span class="pill ${g.status==='completed'?'pill-em':g.status==='abandoned'?'pill-gr':'pill-gd'}">${esc(g.status)}</span>
+        </div>
+        <div class="rowbetween mb-0" style="margin-bottom:10px;">
+          <span class="goal-priority p-${g.priority||'medium'}">${esc(g.priority||'medium')} priority</span>
+          ${Goal._paceBadge(g)}
         </div>
         <div class="progress-track"><div class="progress-fill" style="width:${g.progress_percent}%;"></div></div>
         <div class="rowbetween" style="margin:10px 0 0;font-size:12.5px;">
@@ -2229,9 +2295,11 @@ const Goal = {
         </div>
         <div class="goal-extra">
           <span>${g.deadline? 'Deadline '+fmtDate(g.deadline) : 'No deadline set'}</span>
-          <span><b>${fmtMoney(g.amount_remaining)}</b> remaining</span>
+          <span>${Goal._daysBadge(g) || `<b>${fmtMoney(g.amount_remaining)}</b> remaining`}</span>
         </div>
+        ${g.deadline ? `<div class="goal-extra" style="margin-top:2px;"><span><b>${fmtMoney(g.amount_remaining)}</b> remaining</span>${g.required_daily_amount ? `<span>Needs <b>${fmtMoney(g.required_daily_amount)}</b>/day</span>` : ''}</div>` : ''}
         ${g.estimated_completion_date ? `<div class="goal-extra" style="margin-top:2px;"><span>Est. completion: <b>${fmtDate(g.estimated_completion_date)}</b></span></div>` : ''}
+        ${g.alert_message ? `<div class="goal-alert lvl-${g.alert_level||'info'}"><i class="fa-solid ${g.alert_level==='danger'?'fa-triangle-exclamation':g.alert_level==='warning'?'fa-clock':'fa-circle-info'}"></i><span>${esc(g.alert_message)}</span></div>` : ''}
         <div class="rowactions" style="margin-top:14px;">
           <button class="btn btn-ghost btn-sm" onclick="Goal.openEdit(${g.id})"><i class="fa-solid fa-pen"></i> Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="Goal.openUpdateProgress(${g.id})"><i class="fa-solid fa-arrow-up"></i> Update</button>
@@ -2245,7 +2313,18 @@ const Goal = {
         <div class="field full"><label>Goal name</label><input type="text" id="f_name" placeholder="e.g. Buy a Car"></div>
         <div class="field"><label>Target amount</label><input type="number" id="f_target" placeholder="0"></div>
         <div class="field"><label>Current amount</label><input type="number" id="f_current" placeholder="0" value="0"></div>
-        <div class="field full"><label>Deadline (optional)</label><input type="date" id="f_deadline"></div>
+        <div class="field"><label>Deadline (optional)</label><input type="date" id="f_deadline"></div>
+        <div class="field"><label>Priority</label><select id="f_priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select></div>
+        <div class="field"><label>Remind me starting</label><select id="f_remind">
+          <option value="3">3 days before deadline</option>
+          <option value="7" selected>7 days before deadline</option>
+          <option value="14">14 days before deadline</option>
+          <option value="30">30 days before deadline</option>
+        </select></div>
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save goal</button></div>
     `, ()=>{
@@ -2256,6 +2335,8 @@ const Goal = {
         await api('/goals', {method:'POST', body:{
           name, target_amount: target, current_amount: parseFloat(document.getElementById('f_current').value)||0,
           deadline: document.getElementById('f_deadline').value || null,
+          priority: document.getElementById('f_priority').value,
+          remind_days_before: parseInt(document.getElementById('f_remind').value, 10) || 7,
         }});
         toast('Goal created.', 'success'); Modal.close(); Goal.load();
       };
@@ -2269,6 +2350,17 @@ const Goal = {
         <div class="field"><label>Target amount</label><input type="number" id="f_target" value="${g.target_amount}"></div>
         <div class="field"><label>Current amount</label><input type="number" id="f_current" value="${g.current_amount}"></div>
         <div class="field"><label>Deadline</label><input type="date" id="f_deadline" value="${g.deadline||''}"></div>
+        <div class="field"><label>Priority</label><select id="f_priority">
+          <option value="low" ${g.priority==='low'?'selected':''}>Low</option>
+          <option value="medium" ${(!g.priority||g.priority==='medium')?'selected':''}>Medium</option>
+          <option value="high" ${g.priority==='high'?'selected':''}>High</option>
+        </select></div>
+        <div class="field"><label>Remind me starting</label><select id="f_remind">
+          <option value="3" ${g.remind_days_before===3?'selected':''}>3 days before deadline</option>
+          <option value="7" ${!g.remind_days_before||g.remind_days_before===7?'selected':''}>7 days before deadline</option>
+          <option value="14" ${g.remind_days_before===14?'selected':''}>14 days before deadline</option>
+          <option value="30" ${g.remind_days_before===30?'selected':''}>30 days before deadline</option>
+        </select></div>
         <div class="field"><label>Status</label><select id="f_status">
           <option value="active" ${g.status==='active'?'selected':''}>Active</option>
           <option value="completed" ${g.status==='completed'?'selected':''}>Completed</option>
@@ -2287,6 +2379,8 @@ const Goal = {
             name, target_amount: target,
             current_amount: parseFloat(document.getElementById('f_current').value)||0,
             deadline: document.getElementById('f_deadline').value || null,
+            priority: document.getElementById('f_priority').value,
+            remind_days_before: parseInt(document.getElementById('f_remind').value, 10) || 7,
             status: document.getElementById('f_status').value,
           }});
           toast('Goal updated.', 'success'); Modal.close(); Goal.load(); Notif.poll();
@@ -2334,7 +2428,7 @@ const Todo = {
     const dateMode = document.getElementById('todoFilterDate').value;
     let q = '/todos?limit=200';
     if(status) q += '&status='+status;
-    if(dateMode === 'today') q += '&due_date=' + new Date().toISOString().slice(0,10);
+    if(dateMode === 'today') q += '&due_date=' + localDateStr();
     try{ Todo.data = await api(q); }catch(e){ Todo.data = []; }
     Todo.render();
   },
@@ -2410,7 +2504,7 @@ const Todo = {
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save task</button></div>
     `, ()=>{
-      document.getElementById('f_due').valueAsDate = new Date();
+      setDateInputToday(document.getElementById('f_due'));
       document.getElementById('f_submit').onclick = async ()=>{
         const title = document.getElementById('f_title').value.trim();
         if(!title) return toast('Task title is required.', 'error');
@@ -2682,7 +2776,7 @@ const Journal = {
   async loadToday(){
     try{
       const list = await api('/journal?limit=60');
-      const today = new Date().toISOString().slice(0,10);
+      const today = localDateStr();
       const entry = list.find(j=>j.date===today);
       document.getElementById('jAccomplished').value = entry ? entry.accomplished : '';
       document.getElementById('jChallenges').value = entry ? entry.challenges : '';
@@ -2787,7 +2881,7 @@ document.getElementById('addMilestoneBtn').onclick = ()=>{
     <div class="field"><label>Notes</label><input type="text" id="f_notes" placeholder="Optional"></div>
     <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save milestone</button></div>
   `, ()=>{
-    document.getElementById('f_date').valueAsDate = new Date();
+    setDateInputToday(document.getElementById('f_date'));
     document.getElementById('f_submit').onclick = async ()=>{
       const title = document.getElementById('f_title').value.trim();
       if(!title) return toast('Title is required.', 'error');
