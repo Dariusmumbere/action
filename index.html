@@ -608,6 +608,24 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 .typingDots span:nth-child(2){animation-delay:.15s;}
 .typingDots span:nth-child(3){animation-delay:.3s;}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5;}30%{transform:translateY(-4px);opacity:1;}}
+#printArea{display:none;}
+@media print{
+  body.printing #sidebar, body.printing #sidebarScrim, body.printing #topbar,
+  body.printing #notifDrop, body.printing #modalOverlay, body.printing #toastStack,
+  body.printing #content{ display:none !important; }
+  body.printing #printArea{
+    display:block !important; position:static; color:#111; background:#fff; padding:24px;
+  }
+  body.printing #printArea *{ color:#111 !important; }
+  #printArea h1{font-family:var(--font-display);font-size:22px;margin-bottom:2px;}
+  #printArea .print-sub{font-size:12.5px;color:#555 !important;margin-bottom:18px;}
+  #printArea .print-stats{display:flex;gap:24px;margin-bottom:20px;}
+  #printArea .print-stats div{font-size:13px;}
+  #printArea .print-stats b{display:block;font-size:17px;}
+  #printArea table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  #printArea th, #printArea td{border-bottom:1px solid #ccc;padding:6px 8px;text-align:left;}
+  #printArea th{background:#f2f2f2 !important;}
+}
 </style>
 </head>
 <body>
@@ -700,6 +718,7 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
       </div>
       <div class="navlabel">Wealth</div>
       <div class="navgroup">
+        <a class="navlink" data-section="daily"><i class="fa-solid fa-calendar-days"></i>Daily Tracker</a>
         <a class="navlink" data-section="savings"><i class="fa-solid fa-piggy-bank"></i>Savings</a>
         <a class="navlink" data-section="investments"><i class="fa-solid fa-chart-line"></i>Investments</a>
         <a class="navlink" data-section="assets"><i class="fa-solid fa-vault"></i>Assets</a>
@@ -871,6 +890,38 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           </div>
         </div>
         <div class="glass tblwrap" id="txTableWrap"></div>
+      </section>
+
+      <!-- DAILY TRACKER -->
+      <section class="section" id="section-daily">
+        <div class="rowbetween sectionHead">
+          <div><h2>Daily Tracker</h2><p>Personal daily earnings and expenses — not attached to any business. Expenses reduce earnings automatically.</p></div>
+          <div class="toolbar">
+            <button class="btn btn-ghost" id="printDailyWeeklyBtn"><i class="fa-solid fa-print"></i> Print weekly</button>
+            <button class="btn btn-ghost" id="printDailyMonthlyBtn"><i class="fa-solid fa-print"></i> Print monthly</button>
+            <button class="btn btn-primary" id="addDailyBtn"><i class="fa-solid fa-plus"></i> Add record</button>
+          </div>
+        </div>
+
+        <div class="todo-toprow" id="dailyTodayGrid">
+          <div class="statcard glass"><div class="icn ic-em"><i class="fa-solid fa-sack-dollar"></i></div><div class="lbl">Today's Earnings</div><div class="val" id="dailyTodayEarn">–</div></div>
+          <div class="statcard glass"><div class="icn ic-rd"><i class="fa-solid fa-receipt"></i></div><div class="lbl">Today's Expenses</div><div class="val" id="dailyTodayExp">–</div></div>
+          <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-scale-balanced"></i></div><div class="lbl">Today's Net</div><div class="val" id="dailyTodayNet">–</div></div>
+        </div>
+
+        <div class="review-grid" id="dailyPeriodGrid" style="margin-top:16px;margin-bottom:20px;">
+          <div class="review-mini glass"><div class="skel" style="height:40px;"></div></div>
+        </div>
+
+        <div class="rowbetween sectionHead" style="margin-bottom:12px;">
+          <div><h3 style="font-family:var(--font-display);font-size:15.5px;">All records</h3><p style="margin:0;">Every daily earning and expense you've logged, kept in full.</p></div>
+          <div class="toolbar">
+            <select id="dailyFilterType" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-size:13px;">
+              <option value="">All types</option><option value="earning">Earnings</option><option value="expense">Expenses</option>
+            </select>
+          </div>
+        </div>
+        <div class="glass tblwrap" id="dailyTableWrap"></div>
       </section>
 
       <!-- SAVINGS -->
@@ -1138,6 +1189,7 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 
 <!-- ================= TOASTS ================= -->
 <div id="toastStack"></div>
+<div id="printArea"></div>
 
 <script>
 (function(){
@@ -1375,6 +1427,7 @@ const SECTION_TITLES = {
   analytics: ['Analytics','Trends, comparisons and a 12-month forecast'],
   businesses: ['Businesses','Manage every venture you run'],
   transactions: ['Transactions','Daily revenue and expenses'],
+  daily: ['Daily Tracker','Personal daily earnings & expenses, outside any business'],
   savings: ['Smart Savings','Build your safety net automatically'],
   hotspots: ['Hotspot Business','Installations, ROI and growth projections'],
   investments: ['Investments','Capital that compounds'],
@@ -1404,6 +1457,7 @@ const App = {
     else if(name==='analytics') Analytics.load();
     else if(name==='businesses') Biz.load();
     else if(name==='transactions') Tx.load();
+    else if(name==='daily') Daily.load();
     else if(name==='savings') Sav.load();
     else if(name==='hotspots') Hot.load();
     else if(name==='investments') Inv.load();
@@ -1921,6 +1975,164 @@ const Tx = {
 document.getElementById('addTxBtn').onclick = Tx.openCreate;
 document.getElementById('txFilterBiz').addEventListener('change', Tx.fetch);
 document.getElementById('txFilterType').addEventListener('change', Tx.fetch);
+
+/* ============================================================
+   PRINT — renders any report into #printArea, then invokes the
+   browser print dialog. body.printing hides the app chrome and
+   shows only #printArea (see the @media print rules in <style>).
+   ============================================================ */
+const Print = {
+  run(html){
+    document.getElementById('printArea').innerHTML = html;
+    document.body.classList.add('printing');
+    const done = ()=>{ document.body.classList.remove('printing'); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    setTimeout(()=>window.print(), 60);
+  }
+};
+
+/* ============================================================
+   DAILY TRACKER — personal earnings/expenses, never attached to
+   a business. Expenses reduce earnings automatically everywhere
+   a net figure is shown (dashboard cards, weekly/monthly totals,
+   printed reports).
+   ============================================================ */
+const Daily = {
+  data: [],
+  async load(){
+    document.getElementById('dailyTableWrap').innerHTML = '<div style="padding:20px;"><div class="skel" style="height:220px;"></div></div>';
+    await Promise.all([Daily.fetch(), Daily.loadDashboard()]);
+  },
+  async fetch(){
+    const type = document.getElementById('dailyFilterType').value;
+    let q = '/daily-records?limit=2000';
+    if(type) q += '&type='+type;
+    try{ Daily.data = await api(q); }catch(e){ Daily.data = []; }
+    Daily.render();
+  },
+  async loadDashboard(){
+    let d;
+    try{ d = await api('/daily-records/dashboard'); }catch(e){ return; }
+    document.getElementById('dailyTodayEarn').textContent = fmtMoney(d.today_earnings);
+    document.getElementById('dailyTodayExp').textContent = fmtMoney(d.today_expenses);
+    const netEl = document.getElementById('dailyTodayNet');
+    netEl.textContent = fmtMoney(d.today_net);
+    netEl.style.color = d.today_net>=0 ? 'var(--emerald)' : '#ff9d97';
+
+    document.getElementById('dailyPeriodGrid').innerHTML = `
+      <div class="review-mini glass"><span>This Week — Earnings</span><b>${fmtMoney(d.week_earnings)}</b></div>
+      <div class="review-mini glass"><span>This Week — Expenses</span><b>${fmtMoney(d.week_expenses)}</b></div>
+      <div class="review-mini glass"><span>This Week — Net</span><b style="color:${d.week_net>=0?'var(--emerald)':'#ff9d97'};">${fmtMoney(d.week_net)}</b></div>
+      <div class="review-mini glass"><span>This Month — Earnings</span><b>${fmtMoney(d.month_earnings)}</b></div>
+      <div class="review-mini glass"><span>This Month — Expenses</span><b>${fmtMoney(d.month_expenses)}</b></div>
+      <div class="review-mini glass"><span>This Month — Net</span><b style="color:${d.month_net>=0?'var(--emerald)':'#ff9d97'};">${fmtMoney(d.month_net)}</b></div>
+      <div class="review-mini glass"><span>All-Time Net</span><b style="color:${d.all_time_net>=0?'var(--emerald)':'#ff9d97'};">${fmtMoney(d.all_time_net)}</b></div>
+      <div class="review-mini glass"><span>Total Records</span><b>${d.record_count}</b></div>
+    `;
+  },
+  render(){
+    const wrap = document.getElementById('dailyTableWrap');
+    if(!Daily.data.length){
+      wrap.innerHTML = `<table class="datatable"><tbody>${emptyRow(1,'fa-calendar-days','No daily records yet','Log your first daily earning or expense — nothing here touches your businesses.','Add record','emptyAddDaily')}</tbody></table>`;
+      document.getElementById('emptyAddDaily')?.addEventListener('click', Daily.openCreate);
+      return;
+    }
+    wrap.innerHTML = `<table class="datatable"><thead><tr>
+      <th>Date</th><th>Type</th><th>Category</th><th>Description</th><th style="text-align:right;">Amount</th><th></th>
+    </tr></thead><tbody>
+      ${Daily.data.map(r=>`<tr>
+        <td>${fmtDate(r.date)}</td>
+        <td><span class="pill ${r.type==='earning'?'pill-em':'pill-rd'}">${r.type}</span></td>
+        <td>${esc(r.category)}</td>
+        <td class="text-dim">${esc(r.description)||'—'}</td>
+        <td style="text-align:right;font-family:var(--font-mono);color:${r.type==='earning'?'var(--emerald)':'#ff9d97'}">${r.type==='earning'?'+':'−'}${fmtMoney(r.amount)}</td>
+        <td><div class="rowactions">
+          <button class="iconsm" onclick="Daily.openEdit(${r.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="iconsm danger" onclick="Daily.remove(${r.id})"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  },
+  openCreate(){
+    Modal.open('Add daily record', `
+      <div class="formgrid">
+        <div class="field"><label>Type</label><select id="f_type"><option value="earning">Earning</option><option value="expense">Expense</option></select></div>
+        <div class="field"><label>Amount</label><input type="number" id="f_amount" min="0" step="1" placeholder="0"></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" placeholder="e.g. Food, Transport, Salary" value="Other"></div>
+        <div class="field"><label>Date</label><input type="date" id="f_date"></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" placeholder="Optional"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save record</button></div>
+    `, ()=>{
+      setDateInputToday(document.getElementById('f_date'));
+      document.getElementById('f_submit').onclick = async ()=>{
+        const amount = parseFloat(document.getElementById('f_amount').value);
+        if(!amount || amount<=0) return toast('Enter a valid amount.', 'error');
+        await api('/daily-records', {method:'POST', body:{
+          type: document.getElementById('f_type').value,
+          amount, category: document.getElementById('f_category').value.trim() || 'Other',
+          description: document.getElementById('f_desc').value.trim(),
+          date: document.getElementById('f_date').value || null,
+        }});
+        toast('Daily record saved.', 'success'); Modal.close(); Daily.load();
+      };
+    });
+  },
+  openEdit(id){
+    const r = Daily.data.find(x=>x.id===id); if(!r) return;
+    Modal.open('Edit daily record', `
+      <div class="formgrid">
+        <div class="field"><label>Type</label><select id="f_type"><option value="earning" ${r.type==='earning'?'selected':''}>Earning</option><option value="expense" ${r.type==='expense'?'selected':''}>Expense</option></select></div>
+        <div class="field"><label>Amount</label><input type="number" id="f_amount" value="${r.amount}"></div>
+        <div class="field"><label>Category</label><input type="text" id="f_category" value="${esc(r.category)}"></div>
+        <div class="field"><label>Date</label><input type="date" id="f_date" value="${r.date}"></div>
+        <div class="field full"><label>Description</label><input type="text" id="f_desc" value="${esc(r.description)}"></div>
+      </div>
+      <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
+    `, ()=>{
+      document.getElementById('f_submit').onclick = async ()=>{
+        const amount = parseFloat(document.getElementById('f_amount').value);
+        if(!amount || amount<=0) return toast('Enter a valid amount.', 'error');
+        await api('/daily-records/'+id, {method:'PUT', body:{
+          type: document.getElementById('f_type').value,
+          amount,
+          category: document.getElementById('f_category').value.trim(),
+          description: document.getElementById('f_desc').value.trim(),
+          date: document.getElementById('f_date').value,
+        }});
+        toast('Daily record updated.', 'success'); Modal.close(); Daily.load();
+      };
+    });
+  },
+  async remove(id){
+    if(!confirm('Delete this daily record?')) return;
+    await api('/daily-records/'+id, {method:'DELETE'});
+    toast('Daily record deleted.', 'success'); Daily.load();
+  },
+  async print(period){
+    let r;
+    try{ r = await api('/daily-records/report?period='+period); }catch(e){ return; }
+    const label = period === 'weekly' ? 'Weekly' : 'Monthly';
+    const rowsHtml = r.records.length
+      ? r.records.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.type==='earning'?'Earning':'Expense'}</td><td>${esc(x.category)}</td><td>${esc(x.description)||'—'}</td><td style="text-align:right;">${x.type==='earning'?'+':'−'}${fmtMoney(x.amount)}</td></tr>`).join('')
+      : '<tr><td colspan="5">No records in this period.</td></tr>';
+    Print.run(`
+      <h1>Daily Tracker — ${label} Report</h1>
+      <div class="print-sub">${fmtDate(r.start_date)} – ${fmtDate(r.end_date)} · ${State.user ? State.user.full_name : ''}</div>
+      <div class="print-stats">
+        <div>Total Earnings<b>${fmtMoney(r.total_earnings)}</b></div>
+        <div>Total Expenses<b>${fmtMoney(r.total_expenses)}</b></div>
+        <div>Net (Earnings − Expenses)<b>${fmtMoney(r.net)}</b></div>
+      </div>
+      <table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th style="text-align:right;">Amount</th></tr></thead>
+      <tbody>${rowsHtml}</tbody></table>
+    `);
+  }
+};
+document.getElementById('addDailyBtn').onclick = Daily.openCreate;
+document.getElementById('dailyFilterType').addEventListener('change', Daily.fetch);
+document.getElementById('printDailyWeeklyBtn').onclick = ()=>Daily.print('weekly');
+document.getElementById('printDailyMonthlyBtn').onclick = ()=>Daily.print('monthly');
 
 /* ============================================================
    SAVINGS — tied to a specific business's actual profit
