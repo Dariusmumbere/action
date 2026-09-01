@@ -909,6 +909,22 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
           <div class="statcard glass"><div class="icn ic-gd"><i class="fa-solid fa-scale-balanced"></i></div><div class="lbl">Today's Net</div><div class="val" id="dailyTodayNet">–</div></div>
         </div>
 
+        <div class="glass" id="dailySmartCard" style="padding:20px;margin-top:16px;margin-bottom:20px;">
+          <div class="rowbetween mb-0" style="margin-bottom:10px;align-items:flex-start;">
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:14.5px;margin:0 0 4px;"><i class="fa-solid fa-shield-heart"></i> Daily Limit</h4>
+              <span class="text-dim" style="font-size:12px;" id="dailyLimitCaption">–</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">Daily Score</div>
+              <div style="font-family:var(--font-display);font-size:22px;" id="dailyScoreVal">–</div>
+            </div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="dailyLimitBar" style="width:0%;"></div></div>
+          <div id="dailyLimitCautionWrap"></div>
+          <div id="dailyScoreSuggestions" style="margin-top:10px;font-size:12px;color:var(--text-2);"></div>
+        </div>
+
         <div class="review-grid" id="dailyPeriodGrid" style="margin-top:16px;margin-bottom:20px;">
           <div class="review-mini glass"><div class="skel" style="height:40px;"></div></div>
         </div>
@@ -1145,6 +1161,7 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
               <option value="KES">KES — Kenyan Shilling</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — British Pound</option>
             </select>
           </div>
+          <div class="field"><label>Daily spending limit <span class="text-dim">(Daily Tracker cautions)</span></label><input type="number" id="setDailyLimit" min="0" step="1" placeholder="4000"></div>
           <div class="field"><label>New password <span class="text-dim">(leave blank to keep current)</span></label><input type="password" id="setPassword" placeholder="••••••••"></div>
           <button class="btn btn-primary" id="saveProfileBtn"><i class="fa-solid fa-check"></i> Save changes</button>
         </div>
@@ -2029,6 +2046,30 @@ const Daily = {
       <div class="review-mini glass"><span>All-Time Net</span><b style="color:${d.all_time_net>=0?'var(--emerald)':'#ff9d97'};">${fmtMoney(d.all_time_net)}</b></div>
       <div class="review-mini glass"><span>Total Records</span><b>${d.record_count}</b></div>
     `;
+
+    Daily.renderSmartCard(d);
+  },
+  renderSmartCard(d){
+    const pct = Math.max(0, Math.min(100, d.daily_limit_percent_used||0));
+    const barColor = d.daily_limit_status==='exceeded' ? '#f0655f' : d.daily_limit_status==='caution' ? '#e8b84b' : null;
+    const bar = document.getElementById('dailyLimitBar');
+    bar.style.width = pct+'%';
+    bar.style.background = barColor || '';
+    document.getElementById('dailyLimitCaption').textContent = d.daily_limit_status==='unset'
+      ? 'No daily limit set — add one in Settings.'
+      : `${fmtMoney(d.today_expenses)} of ${fmtMoney(d.daily_limit)} spent today`;
+    document.getElementById('dailyScoreVal').textContent = (d.tracker_score!=null ? d.tracker_score : '–') + (d.tracker_score!=null ? '%' : '');
+
+    const cautionWrap = document.getElementById('dailyLimitCautionWrap');
+    const cautions = d.tracker_cautions || [];
+    cautionWrap.innerHTML = cautions.length
+      ? cautions.map(c=>`<div class="goal-alert lvl-${d.daily_limit_status==='exceeded'?'danger':'warning'}" style="margin-top:10px;"><i class="fa-solid fa-triangle-exclamation"></i><span>${esc(c)}</span></div>`).join('')
+      : '';
+
+    const suggestions = d.tracker_suggestions || [];
+    document.getElementById('dailyScoreSuggestions').innerHTML = suggestions.length
+      ? '<ul class="priority-list">'+suggestions.map(s=>`<li><i class="fa-solid fa-circle"></i>${esc(s)}</li>`).join('')+'</ul>'
+      : '';
   },
   render(){
     const wrap = document.getElementById('dailyTableWrap');
@@ -3298,6 +3339,7 @@ const Settings = {
   async load(){
     document.getElementById('setName').value = State.user.full_name;
     document.getElementById('setCurrency').value = State.user.currency;
+    document.getElementById('setDailyLimit').value = State.user.daily_expense_limit ?? 4000;
     document.getElementById('setApiBase').value = State.apiBase;
     try{
       const m = await api('/mission');
@@ -3361,6 +3403,8 @@ document.getElementById('addPrincipleBtn').onclick = async ()=>{
 };
 document.getElementById('saveProfileBtn').onclick = async ()=>{
   const body = { full_name: document.getElementById('setName').value.trim(), currency: document.getElementById('setCurrency').value };
+  const limitVal = document.getElementById('setDailyLimit').value;
+  if(limitVal !== '') body.daily_expense_limit = parseFloat(limitVal) || 0;
   const pw = document.getElementById('setPassword').value;
   if(pw) body.password = pw;
   const updated = await api('/me', {method:'PUT', body});
