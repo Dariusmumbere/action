@@ -195,6 +195,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 .field input:focus,.field select:focus{border-color:var(--emerald-dim);box-shadow:0 0 0 3px var(--emerald-glow);}
 .field input::placeholder{color:var(--text-2);}
+.checklabel{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text-1);font-weight:400;cursor:pointer;}
+.checklabel input[type="checkbox"]{width:16px;height:16px;flex:none;margin-top:2px;accent-color:var(--emerald);}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:11px 18px;border-radius:var(--radius-sm);border:none;
@@ -454,8 +456,8 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 .mc-stats{display:flex;gap:30px;margin-top:14px;font-size:12.5px;color:var(--text-2);position:relative;z-index:1;flex-wrap:wrap;}
 .mc-stats b{color:var(--text-0);font-family:var(--font-mono);font-size:13px;}
 
-/* Widget row (hotspot / execution score / motivation) */
-.dashRow3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+/* Widget row (hotspot / motivation) */
+.dashRow3{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px;}
 @media (max-width:980px){.dashRow3{grid-template-columns:1fr;}}
 .todayRow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px;}
 .todayRow2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
@@ -598,6 +600,14 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
 .chatpanel{padding:0;display:flex;flex-direction:column;height:520px;overflow:hidden;}
 .chatMessages{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
 .chatMsg{max-width:80%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;}
+.chatMsg.assistant p{margin:0 0 8px;}
+.chatMsg.assistant p:last-child{margin-bottom:0;}
+.chatMsg.assistant h3,.chatMsg.assistant h4,.chatMsg.assistant h5{font-family:var(--font-display);margin:10px 0 6px;color:var(--text-0);}
+.chatMsg.assistant h3:first-child,.chatMsg.assistant h4:first-child,.chatMsg.assistant h5:first-child{margin-top:0;}
+.chatMsg.assistant ul,.chatMsg.assistant ol{margin:0 0 8px;padding-left:20px;}
+.chatMsg.assistant li{margin:3px 0;}
+.chatMsg.assistant strong{color:var(--emerald);font-weight:700;}
+.chatMsg.assistant code{background:rgba(126,211,171,0.14);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);font-size:12.5px;}
 .chatMsg.user{align-self:flex-end;background:linear-gradient(120deg,var(--emerald),#22c398);color:#06140f;border-bottom-right-radius:4px;}
 .chatMsg.assistant{align-self:flex-start;background:rgba(126,211,171,0.08);border:1px solid var(--panel-border);border-bottom-left-radius:4px;}
 .chatInputRow{border-top:1px solid var(--panel-border);padding:14px 16px;display:flex;gap:10px;align-items:flex-end;}
@@ -769,7 +779,6 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         <a class="navlink" data-section="transactions"><i class="fa-solid fa-right-left"></i>Transactions</a>
         <a class="navlink" data-section="hotspots"><i class="fa-solid fa-wifi"></i>Hotspots</a>
         <a class="navlink" data-section="daily"><i class="fa-solid fa-calendar-days"></i>Daily Tracker</a>
-        <a class="navlink" data-section="savings"><i class="fa-solid fa-piggy-bank"></i>Savings</a>
         <a class="navlink" data-section="investments"><i class="fa-solid fa-chart-line"></i>Investments</a>
         <a class="navlink" data-section="assets"><i class="fa-solid fa-vault"></i>Assets</a>
       </div>
@@ -867,10 +876,6 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         <div class="dashRow3">
           <div class="glass widgetcard" id="hotspotWidget">
             <h4><i class="fa-solid fa-wifi"></i>Hotspot Progress</h4>
-            <div class="skel" style="height:70px;"></div>
-          </div>
-          <div class="glass widgetcard" id="execScoreWidget">
-            <h4><i class="fa-solid fa-bolt"></i>Today's Execution Score</h4>
             <div class="skel" style="height:70px;"></div>
           </div>
           <div class="glass widgetcard" id="motivationWidget">
@@ -1010,15 +1015,26 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
         <div class="glass tblwrap" id="txTableWrap"></div>
       </section>
 
-      <!-- DAILY TRACKER -->
+      <!-- DAILY TRACKER (earnings, savings & expenses — all in one place) -->
       <section class="section" id="section-daily">
         <div class="rowbetween sectionHead">
-          <div><h2>Daily Tracker</h2><p>Personal daily earnings and expenses — not attached to any business. Expenses reduce earnings automatically.</p></div>
+          <div><h2>Daily Tracker</h2><p>Your earnings, savings and expenses in one place — including one-time amounts — so you always know what's actually available to use.</p></div>
           <div class="toolbar">
             <button class="btn btn-ghost" id="printDailyWeeklyBtn"><i class="fa-solid fa-print"></i> Print weekly</button>
             <button class="btn btn-ghost" id="printDailyMonthlyBtn"><i class="fa-solid fa-print"></i> Print monthly</button>
             <button class="btn btn-primary" id="addDailyBtn"><i class="fa-solid fa-plus"></i> Add record</button>
           </div>
+        </div>
+
+        <div class="glass" id="dailyAvailableCard" style="padding:22px;margin-bottom:20px;background:linear-gradient(135deg, rgba(126,211,171,0.10), rgba(126,211,171,0.02));border-color:var(--emerald-dim);">
+          <div style="font-size:11px;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Available for use right now</div>
+          <div style="font-family:var(--font-display);font-size:34px;margin:4px 0 10px;" id="dailyAvailableVal">–</div>
+          <div class="review-grid" id="dailyAvailableBreakdown" style="margin:0;">
+            <div class="review-mini glass"><span>All-time Earnings</span><b id="dailyAllEarn">–</b></div>
+            <div class="review-mini glass"><span>All-time Expenses</span><b id="dailyAllExp">–</b></div>
+            <div class="review-mini glass"><span>Set Aside in Savings</span><b id="dailyAllSavings">–</b></div>
+          </div>
+          <p class="hint" style="margin:10px 0 0;" id="dailyOneOffNote"></p>
         </div>
 
         <div class="todo-toprow" id="dailyTodayGrid">
@@ -1053,16 +1069,19 @@ table.datatable tr:hover td{background:rgba(126,211,171,0.045);}
             <select id="dailyFilterType" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-size:13px;">
               <option value="">All types</option><option value="earning">Earnings</option><option value="expense">Expenses</option>
             </select>
+            <select id="dailyFilterOneOff" style="padding:9px 12px;border-radius:9px;border:1px solid var(--panel-border);background:var(--bg-2);color:var(--text-0);font-size:13px;">
+              <option value="">Regular + one-time</option><option value="1">One-time only</option><option value="0">Regular only</option>
+            </select>
           </div>
         </div>
         <div class="glass tblwrap" id="dailyTableWrap"></div>
-      </section>
 
-      <!-- SAVINGS -->
-      <section class="section" id="section-savings">
-        <div class="rowbetween sectionHead">
-          <div><h2>Smart Savings</h2><p>Set a percentage of profit aside from the exact business that earned it.</p></div>
-          <button class="btn btn-primary" id="addSavingsBtn"><i class="fa-solid fa-plus"></i> Record savings</button>
+        <!-- SAVINGS (kept on the same page as earnings & expenses) -->
+        <div class="rowbetween sectionHead" style="margin-top:32px;margin-bottom:12px;">
+          <div><h3 style="font-family:var(--font-display);font-size:15.5px;"><i class="fa-solid fa-piggy-bank"></i> Savings</h3><p style="margin:0;">Set a percentage of profit aside from the exact business that earned it — subtracted from your available balance above.</p></div>
+          <div class="toolbar">
+            <button class="btn btn-primary" id="addSavingsBtn"><i class="fa-solid fa-plus"></i> Record savings</button>
+          </div>
         </div>
         <div class="empire-grid" id="savingsCapacityGrid" style="margin-bottom:20px;"></div>
         <div class="cardgrid" id="savingsCards"></div>
@@ -1467,6 +1486,33 @@ function setDateInputToday(el){
   if(el) el.value = localDateStr();
 }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* Lightweight markdown-ish renderer for AI Advisor replies — headings,
+   bold/italic, inline code, bullet/numbered lists and paragraphs. Escapes
+   HTML first so nothing from the model can inject markup. */
+function mdToHtml(raw){
+  const src = esc(String(raw==null?'':raw)).replace(/\r\n/g,'\n');
+  const lines = src.split('\n');
+  let html = ''; let inUl=false, inOl=false, para=[];
+  const inlineFmt = t => t
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  const flushPara = ()=>{ if(para.length){ html += '<p>'+inlineFmt(para.join(' '))+'</p>'; para=[]; } };
+  const closeLists = ()=>{ if(inUl){ html+='</ul>'; inUl=false; } if(inOl){ html+='</ol>'; inOl=false; } };
+  for(const line of lines){
+    const t = line.trim();
+    if(!t){ flushPara(); closeLists(); continue; }
+    const h = t.match(/^(#{1,4})\s+(.*)$/);
+    if(h){ flushPara(); closeLists(); const lvl=Math.min(h[1].length+2,6); html += `<h${lvl}>${inlineFmt(h[2])}</h${lvl}>`; continue; }
+    const ol = t.match(/^\d+[.)]\s+(.*)$/);
+    if(ol){ flushPara(); if(inUl){html+='</ul>';inUl=false;} if(!inOl){html+='<ol>';inOl=true;} html+='<li>'+inlineFmt(ol[1])+'</li>'; continue; }
+    const ul = t.match(/^[-*•]\s+(.*)$/);
+    if(ul){ flushPara(); if(inOl){html+='</ol>';inOl=false;} if(!inUl){html+='<ul>';inUl=true;} html+='<li>'+inlineFmt(ul[1])+'</li>'; continue; }
+    closeLists(); para.push(t);
+  }
+  flushPara(); closeLists();
+  return html || inlineFmt(src);
+}
 
 /* ============================================================
    TOASTS
@@ -1659,8 +1705,7 @@ const App = {
     else if(name==='objectives') Obj.load();
     else if(name==='businesses') Biz.load();
     else if(name==='transactions') Tx.load();
-    else if(name==='daily') Daily.load();
-    else if(name==='savings') Sav.load();
+    else if(name==='daily') { Daily.load(); Sav.load(); }
     else if(name==='hotspots') Hot.load();
     else if(name==='investments') Inv.load();
     else if(name==='assets') Asset.load();
@@ -2293,7 +2338,6 @@ const Dash = {
 
     Mission.load();
     HotspotWidget.load();
-    ExecScoreWidget.load();
     IdentityWidget.load();
   }
 };
@@ -2387,25 +2431,6 @@ const HotspotWidget = {
       </div>
       <div class="progress-track"><div class="progress-fill" style="width:${p.completion_percent}%;"></div></div>
       ${p.days_until_target!=null ? `<p class="hint" style="margin-top:10px;">You can afford another hotspot in about <b style="color:var(--text-0);">${p.days_until_target} day(s)</b> at your current savings rate.</p>` : ''}
-    `;
-  }
-};
-
-const ExecScoreWidget = {
-  async load(){
-    const box = document.getElementById('execScoreWidget');
-    let d;
-    try{ d = await api('/execution-score/today'); }catch(e){ box.innerHTML = '<h4><i class="fa-solid fa-bolt"></i>Today\'s Execution Score</h4><p class="text-dim">Unavailable.</p>'; return; }
-    box.innerHTML = `
-      <h4><i class="fa-solid fa-bolt"></i>Today's Execution Score</h4>
-      <div class="ringwrap">
-        <div class="ring" style="--p:${d.score};"><span>${Math.round(d.score)}%</span></div>
-        <div class="ring-meta">
-          <div class="rm-label">${d.score>=80?'Excellent day':d.score>=50?'Solid progress':'Room to improve'}</div>
-          Revenue ${d.breakdown.revenue_recorded?'✔':'✘'} · Expenses ${d.breakdown.expenses_recorded?'✔':'✘'} · Savings ${d.breakdown.savings_updated?'✔':'✘'} · Journal ${d.breakdown.journal_completed?'✔':'✘'} · Tasks ${d.breakdown.tasks_completed||'0/0'}
-        </div>
-      </div>
-      <ul class="suggestlist">${(d.suggestions||[]).slice(0,3).map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
     `;
   }
 };
@@ -2655,8 +2680,10 @@ const Daily = {
   },
   async fetch(){
     const type = document.getElementById('dailyFilterType').value;
+    const oneOff = document.getElementById('dailyFilterOneOff').value;
     let q = '/daily-records?limit=2000';
     if(type) q += '&type='+type;
+    if(oneOff) q += '&is_one_off='+oneOff;
     try{ Daily.data = await api(q); }catch(e){ Daily.data = []; }
     Daily.render();
   },
@@ -2668,6 +2695,19 @@ const Daily = {
     const netEl = document.getElementById('dailyTodayNet');
     netEl.textContent = fmtMoney(d.today_net);
     netEl.style.color = d.today_net>=0 ? 'var(--emerald)' : '#ff9d97';
+
+    const availEl = document.getElementById('dailyAvailableVal');
+    availEl.textContent = fmtMoney(d.available_balance);
+    availEl.style.color = d.available_balance>=0 ? 'var(--emerald)' : '#ff9d97';
+    document.getElementById('dailyAllEarn').textContent = fmtMoney(d.all_time_earnings);
+    document.getElementById('dailyAllExp').textContent = fmtMoney(d.all_time_expenses);
+    document.getElementById('dailyAllSavings').textContent = fmtMoney(d.savings_balance);
+    const oneOffNote = document.getElementById('dailyOneOffNote');
+    if((d.one_off_earnings||0) > 0 || (d.one_off_expenses||0) > 0){
+      oneOffNote.innerHTML = `Includes <b style="color:var(--text-0);">${fmtMoney(d.one_off_earnings)}</b> in one-time earnings and <b style="color:var(--text-0);">${fmtMoney(d.one_off_expenses)}</b> in one-time expenses, counted above.`;
+    } else {
+      oneOffNote.textContent = 'No one-time amounts logged yet — flag a bonus, gift or emergency bill as "one-time" when adding a record to track it separately.';
+    }
 
     document.getElementById('dailyPeriodGrid').innerHTML = `
       <div class="review-mini glass"><span>This Week — Earnings</span><b>${fmtMoney(d.week_earnings)}</b></div>
@@ -2716,7 +2756,7 @@ const Daily = {
     </tr></thead><tbody>
       ${Daily.data.map(r=>`<tr>
         <td>${fmtDate(r.date)}</td>
-        <td><span class="pill ${r.type==='earning'?'pill-em':'pill-rd'}">${r.type}</span></td>
+        <td><span class="pill ${r.type==='earning'?'pill-em':'pill-rd'}">${r.type}</span>${r.is_one_off?' <span class="pill pill-gd" title="One-time amount">one-time</span>':''}</td>
         <td>${esc(r.category)}</td>
         <td class="text-dim">${esc(r.description)||'—'}</td>
         <td style="text-align:right;font-family:var(--font-mono);color:${r.type==='earning'?'var(--emerald)':'#ff9d97'}">${r.type==='earning'?'+':'−'}${fmtMoney(r.amount)}</td>
@@ -2735,6 +2775,7 @@ const Daily = {
         <div class="field"><label>Category</label><input type="text" id="f_category" placeholder="e.g. Food, Transport, Salary" value="Other"></div>
         <div class="field"><label>Date</label><input type="date" id="f_date"></div>
         <div class="field full"><label>Description</label><input type="text" id="f_desc" placeholder="Optional"></div>
+        <div class="field full"><label class="checklabel"><input type="checkbox" id="f_oneoff"> This is a one-time amount (bonus, gift, emergency bill…), not part of your regular flow</label></div>
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save record</button></div>
     `, ()=>{
@@ -2747,6 +2788,7 @@ const Daily = {
           amount, category: document.getElementById('f_category').value.trim() || 'Other',
           description: document.getElementById('f_desc').value.trim(),
           date: document.getElementById('f_date').value || null,
+          is_one_off: document.getElementById('f_oneoff').checked,
         }});
         toast('Daily record saved.', 'success'); Modal.close(); Daily.load();
       };
@@ -2761,6 +2803,7 @@ const Daily = {
         <div class="field"><label>Category</label><input type="text" id="f_category" value="${esc(r.category)}"></div>
         <div class="field"><label>Date</label><input type="date" id="f_date" value="${r.date}"></div>
         <div class="field full"><label>Description</label><input type="text" id="f_desc" value="${esc(r.description)}"></div>
+        <div class="field full"><label class="checklabel"><input type="checkbox" id="f_oneoff" ${r.is_one_off?'checked':''}> This is a one-time amount (bonus, gift, emergency bill…), not part of your regular flow</label></div>
       </div>
       <div class="modalActions"><button class="btn btn-primary btn-block" id="f_submit"><i class="fa-solid fa-check"></i> Save changes</button></div>
     `, ()=>{
@@ -2773,6 +2816,7 @@ const Daily = {
           category: document.getElementById('f_category').value.trim(),
           description: document.getElementById('f_desc').value.trim(),
           date: document.getElementById('f_date').value,
+          is_one_off: document.getElementById('f_oneoff').checked,
         }});
         toast('Daily record updated.', 'success'); Modal.close(); Daily.load();
       };
@@ -2805,6 +2849,7 @@ const Daily = {
 };
 document.getElementById('addDailyBtn').onclick = Daily.openCreate;
 document.getElementById('dailyFilterType').addEventListener('change', Daily.fetch);
+document.getElementById('dailyFilterOneOff').addEventListener('change', Daily.fetch);
 document.getElementById('printDailyWeeklyBtn').onclick = ()=>Daily.print('weekly');
 document.getElementById('printDailyMonthlyBtn').onclick = ()=>Daily.print('monthly');
 
@@ -3690,7 +3735,7 @@ const Todo = {
   render(){
     const wrap = document.getElementById('todoList');
     if(!Todo.data.length){
-      wrap.innerHTML = `<div class="glass"><div class="emptystate"><i class="fa-solid fa-list-check"></i><h4>No tasks yet</h4><p>Add today's tasks — completing them raises your daily execution score.</p><button class="btn btn-primary btn-sm" id="emptyAddTodo"><i class="fa-solid fa-plus"></i> Add task</button></div></div>`;
+      wrap.innerHTML = `<div class="glass"><div class="emptystate"><i class="fa-solid fa-list-check"></i><h4>No tasks yet</h4><p>Add today's tasks — completing them raises your identity alignment score.</p><button class="btn btn-primary btn-sm" id="emptyAddTodo"><i class="fa-solid fa-plus"></i> Add task</button></div></div>`;
       document.getElementById('emptyAddTodo').onclick = Todo.openCreate;
       return;
     }
@@ -3722,12 +3767,15 @@ const Todo = {
   },
   async loadStats(){
     try{
-      const s = await api('/execution-score/today');
-      const total = s.breakdown.tasks_completed ? s.breakdown.tasks_completed.split('/')[1] : '0';
-      const done = s.breakdown.tasks_completed ? s.breakdown.tasks_completed.split('/')[0] : '0';
+      const [todayTodos, ia] = await Promise.all([
+        api('/todos?limit=200&due_date=' + localDateStr()),
+        api('/scores/identity-alignment'),
+      ]);
+      const total = todayTodos.length;
+      const done = todayTodos.filter(t=>t.status==='completed').length;
       document.getElementById('todoStatTotal').textContent = total;
       document.getElementById('todoStatDone').textContent = done;
-      document.getElementById('todoStatScore').textContent = Math.round(s.score) + '%';
+      document.getElementById('todoStatScore').textContent = Math.round(ia.total) + '%';
     }catch(e){
       document.getElementById('todoStatTotal').textContent = '–';
       document.getElementById('todoStatDone').textContent = '–';
@@ -3991,7 +4039,8 @@ const Chat = {
     if(empty) empty.remove();
     const el = document.createElement('div');
     el.className = 'chatMsg ' + (role==='user' ? 'user' : 'assistant');
-    el.textContent = content;
+    if(role==='user'){ el.textContent = content; }
+    else { el.innerHTML = mdToHtml(content); }
     box.appendChild(el);
     if(scroll !== false) box.scrollTop = box.scrollHeight;
     return el;
@@ -4389,9 +4438,9 @@ const Analytics = {
     }
 
     let scoreHist;
-    try{ scoreHist = await api('/execution-score/history?days=30'); }catch(e){ scoreHist = []; }
+    try{ scoreHist = await api('/scores/identity-alignment/history?days=30'); }catch(e){ scoreHist = []; }
     lineChart('chartScoreHistory','scoreHist', scoreHist.map(s=>fmtDate(s.date)), [
-      {label:'Daily execution score', data:scoreHist.map(s=>s.score), borderColor:'#eec065', backgroundColor:'rgba(238,192,101,0.12)', fill:true, tension:.3, pointRadius:2, borderWidth:2},
+      {label:'Daily identity alignment score', data:scoreHist.map(s=>s.score), borderColor:'#eec065', backgroundColor:'rgba(238,192,101,0.12)', fill:true, tension:.3, pointRadius:2, borderWidth:2},
     ]);
   }
 };
@@ -4452,7 +4501,7 @@ const Rep = {
       <div class="review-mini glass"><span>Worst Business</span><b>${esc(w.worst_business||'—')}</b></div>
       <div class="review-mini glass"><span>Savings This Week</span><b>${fmtMoney(w.savings_this_week)}</b></div>
       <div class="review-mini glass"><span>Investments This Week</span><b>${fmtMoney(w.investments_this_week)}</b></div>
-      <div class="review-mini glass"><span>Avg Execution Score</span><b>${w.avg_execution_score!=null ? w.avg_execution_score+'%' : '—'}</b></div>
+      <div class="review-mini glass"><span>Avg Identity Alignment</span><b>${w.avg_identity_alignment_score!=null ? w.avg_identity_alignment_score+'%' : '—'}</b></div>
       <div class="review-mini glass"><span>Tasks Completed</span><b>${w.week_tasks_done ?? 0}/${w.week_tasks_total ?? 0}</b></div>
     `;
     const lessons = document.getElementById('weeklyLessons');
